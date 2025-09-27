@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import UserMenu from "@/components/UserMenu";
 import { useTranslations } from "@/hooks/useTranslations";
 
 const Index = () => {
@@ -11,8 +12,9 @@ const Index = () => {
 
   return (
     <div className="h-screen bg-gradient-hero flex flex-col items-center justify-center px-6 overflow-hidden relative">
-      {/* Language Selector - Top Right */}
-      <div className="absolute top-6 right-6 z-10">
+      {/* Header with User Menu and Language Selector */}
+      <div className="absolute top-6 right-6 z-10 flex items-center gap-4">
+        <UserMenu />
         <LanguageSelector />
       </div>
 
