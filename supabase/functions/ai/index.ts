@@ -77,31 +77,39 @@ Format as JSON:
 
 CRITICAL: Every activity MUST include accurate GPS coordinates using Google Maps data. Use your Google Maps integration to get precise latitude and longitude for each location in Hong Kong.`;
 
-    // Call Lovable AI Gateway
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call Google Gemini API
+    const geminiApiKey = Deno.env.get('GOOGLE_GEMINI_API_KEY');
+    if (!geminiApiKey) {
+      throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+    }
+
+    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
+        contents: [
           {
-            role: 'user',
-            content: prompt
+            parts: [
+              {
+                text: prompt
+              }
+            ]
           }
         ],
-        temperature: 0.7,
+        generationConfig: {
+          temperature: 0.7,
+        },
       }),
     });
 
     if (!aiResponse.ok) {
-      throw new Error(`AI Gateway error: ${aiResponse.status}`);
+      throw new Error(`Gemini API error: ${aiResponse.status} ${aiResponse.statusText}`);
     }
 
     const aiData = await aiResponse.json();
-    let itineraryContent = aiData.choices[0].message.content;
+    let itineraryContent = aiData.candidates[0].content.parts[0].text;
 
     // Try to parse as JSON, fallback to text if needed
     let parsedItinerary;
