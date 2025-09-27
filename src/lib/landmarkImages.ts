@@ -11,11 +11,14 @@ import victoriaPeakImg from '@/assets/landmarks/victoriapeak_img.jpg';
 
 const LANDMARK_MAP: Record<string, string> = {
   'avenue-stars': avenueOfStarsImg,
+  'avenue-of-stars': avenueOfStarsImg,
   'disneyland': disneylandImg,
   'dragons-back': dragonsBackImg,
   'm-plus': mPlusMuseumImg,
+  'm-plus-museum': mPlusMuseumImg,
   'ocean-park': oceanParkImg,
   'temple-street': templeStreetImg,
+  'temple-street-night-market': templeStreetImg,
   'victoria-harbour': victoriaHarbourImg,
   'victoria-peak': victoriaPeakImg,
 };
