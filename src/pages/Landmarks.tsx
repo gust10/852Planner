@@ -198,7 +198,6 @@ const Landmarks = () => {
         <Button
           size="lg"
           onClick={handleContinue}
-          disabled={selectedLandmarks.length === 0}
           className="w-full neon-button py-4"
         >
           {t('itinerary.title')} ({selectedLandmarks.length} places)

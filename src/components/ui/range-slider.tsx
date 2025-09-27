@@ -12,7 +12,7 @@ const RangeSlider = React.forwardRef<
     className={cn("relative flex w-full touch-none select-none items-center", className)}
     {...props}
   >
-    <SliderPrimitive.Track className="relative h-3 w-full grow overflow-hidden rounded-full bg-muted/30">
+  <SliderPrimitive.Track className="relative h-3 w-full grow overflow-hidden rounded-full bg-gray-300">
       <SliderPrimitive.Range className="absolute h-full progress-gradient rounded-full" />
     </SliderPrimitive.Track>
     {/* Start thumb - normal styling */}
