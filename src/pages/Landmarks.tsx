@@ -55,7 +55,7 @@ const Landmarks = () => {
       tags: ["family", "nature", "entertainment"]
     },
     {
-      id: "avenue-stars",
+      id: "avenue-of-stars",
       name: "Avenue of Stars",
       category: "Cultural",
       rating: 4.2,
@@ -75,7 +75,7 @@ const Landmarks = () => {
       tags: ["hiking", "nature", "adventure"]
     },
     {
-      id: "m-plus",
+      id: "m-plus-museum",
       name: "M+ Museum",
       category: "Museum",
       rating: 4.3,
@@ -85,7 +85,7 @@ const Landmarks = () => {
       tags: ["museums", "cultural", "art"]
     },
     {
-      id: "temple-street",
+      id: "temple-street-night-market",
       name: "Temple Street Night Market",
       category: "Shopping",
       rating: 4.1,
