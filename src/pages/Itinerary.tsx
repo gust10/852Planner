@@ -3,33 +3,97 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MapPin, Clock, Navigation, ArrowLeft, Share2, ChevronLeft, ChevronRight, Loader2, Sparkles, Code, ExternalLink } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { MapPin, Clock, Navigation, ArrowLeft, Share2, ChevronLeft, ChevronRight, Loader2, Sparkles, Code, ExternalLink, Save, BookmarkPlus, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Map from "@/components/Map";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthModal from "@/components/AuthModal";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 const Itinerary = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslations();
-  const { surveyData, selectedLandmarks } = location.state || {};
+  const { user } = useAuth();
+  const { surveyData, selectedLandmarks, savedItinerary, itineraryId } = location.state || {};
   const [currentDay, setCurrentDay] = useState(0);
-  const [aiItinerary, setAiItinerary] = useState<any>(null);
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [aiItinerary, setAiItinerary] = useState<any>(savedItinerary || null);
+  const [isGenerating, setIsGenerating] = useState(!savedItinerary);
   const [error, setError] = useState<string | null>(null);
   const [isFetchingImages, setIsFetchingImages] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(!!itineraryId);
+  const [saveData, setSaveData] = useState({
+    title: '',
+    description: '',
+    isPublic: false
+  });
 
-  // Generate AI-powered itinerary
-  const generateAiItinerary = async () => {
-    if (!selectedLandmarks || selectedLandmarks.length === 0) {
-      setError('No landmarks selected');
-      setIsGenerating(false);
+  // Save itinerary to database
+  const handleSaveItinerary = async () => {
+    if (!user) {
+      setShowSaveDialog(false);
+      setShowAuthModal(true);
       return;
     }
 
+    setIsSaving(true);
+    try {
+      const itineraryData = {
+        user_id: user.id,
+        title: saveData.title || `Hong Kong Adventure - ${new Date().toLocaleDateString()}`,
+        description: saveData.description,
+        survey_data: surveyData,
+        selected_landmarks: selectedLandmarks,
+        generated_itinerary: aiItinerary,
+        start_date: surveyData?.startDate || surveyData?.dateRange?.from,
+        end_date: surveyData?.endDate || surveyData?.dateRange?.to,
+        is_public: saveData.isPublic
+      };
+
+      const { error } = await supabase
+        .from('itineraries')
+        .insert([itineraryData]);
+
+      if (error) throw error;
+
+      setIsSaved(true);
+      setShowSaveDialog(false);
+      toast({
+        title: "✨ Itinerary Saved!",
+        description: "Your adventure has been saved to your dashboard.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Save failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Generate AI-powered itinerary
+  useEffect(() => {
+    if (!savedItinerary && selectedLandmarks && selectedLandmarks.length > 0) {
+      generateAiItinerary();
+    } else if (!savedItinerary) {
+      setError('No landmarks selected');
+      setIsGenerating(false);
+    }
+  }, [savedItinerary, selectedLandmarks]);
+
+  const generateAiItinerary = async () => {
     try {
       setIsGenerating(true);
       setError(null);
@@ -151,9 +215,7 @@ const Itinerary = () => {
     }
   };
 
-  useEffect(() => {
-    generateAiItinerary();
-  }, []);
+  // Only needed for loading saved itinerary, generation is handled in previous useEffect
 
   const itinerary = aiItinerary?.days || [];
 
@@ -447,6 +509,48 @@ const Itinerary = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Modify
           </Button>
+          
+          {/* Save Button */}
+          {!isSaved ? (
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() => {
+                if (!user) {
+                  setShowAuthModal(true);
+                } else {
+                  setShowSaveDialog(true);
+                }
+              }}
+              className="interactive-scale"
+            >
+              <BookmarkPlus className="w-4 h-4 mr-2" />
+              Save
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="default"
+              disabled
+              className="interactive-scale"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Saved
+            </Button>
+          )}
+
+          {/* View Dashboard Button */}
+          {user && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate('/dashboard')}
+              className="interactive-scale"
+            >
+              <Calendar className="w-4 h-4" />
+            </Button>
+          )}
+
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -468,6 +572,7 @@ const Itinerary = () => {
               </div>
             </DialogContent>
           </Dialog>
+          
           <Button
             size="default"
             onClick={handleShare}
@@ -477,6 +582,71 @@ const Itinerary = () => {
             Share
           </Button>
         </div>
+
+        {/* Save Dialog */}
+        <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Save Your Itinerary</DialogTitle>
+              <DialogDescription>
+                Save this itinerary to your dashboard for future reference
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  placeholder="My Hong Kong Adventure"
+                  value={saveData.title}
+                  onChange={(e) => setSaveData({ ...saveData, title: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description (optional)</Label>
+                <Textarea
+                  id="description"
+                  placeholder="A memorable trip to Hong Kong..."
+                  value={saveData.description}
+                  onChange={(e) => setSaveData({ ...saveData, description: e.target.value })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="public" className="flex items-center gap-2">
+                  Make public
+                  <span className="text-xs text-muted-foreground">(share with others)</span>
+                </Label>
+                <Switch
+                  id="public"
+                  checked={saveData.isPublic}
+                  onCheckedChange={(checked) => setSaveData({ ...saveData, isPublic: checked })}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveItinerary} disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Itinerary'
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Auth Modal */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          defaultTab="signup"
+        />
       </div>
     </div>
   );
