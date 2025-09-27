@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { MapPin, Clock, Navigation, ArrowLeft, Share2, ChevronLeft, ChevronRight, Loader2, Sparkles, Code, ExternalLink, Save, BookmarkPlus, Calendar } from "lucide-react";
+import { MapPin, Clock, Navigation, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Code, ExternalLink, Save, BookmarkPlus, Calendar, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Map from "@/components/Map";
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import confetti from 'canvas-confetti';
 
 const Itinerary = () => {
   const location = useLocation();
@@ -115,9 +116,11 @@ const Itinerary = () => {
         // Fetch images for all activities
         await fetchImagesForItinerary(functionData.itinerary);
         
-        toast({
-          title: "✨ Itinerary Generated!",
-          description: "Your personalized Hong Kong adventure is ready!",
+        // Celebration confetti effect
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
         });
       } else {
         throw new Error(functionData?.error || "Invalid response from AI");
@@ -220,27 +223,34 @@ const Itinerary = () => {
   const itinerary = aiItinerary?.days || [];
 
   const handleBack = () => {
-    navigate("/landmarks", { state: { surveyData } });
-  };
-
-  const handleShare = () => {
-    // Mock share functionality
-    navigator.share?.({
-      title: "My Hong Kong Itinerary",
-      text: `Check out my Hong Kong adventure itinerary!`,
-      url: window.location.href
-    });
+    navigate("/survey", { state: { surveyData, step: 6 } });
   };
 
   const nextDay = () => {
     if (currentDay < itinerary.length - 1) {
       setCurrentDay(prev => prev + 1);
+      // Smooth scroll the scrollable content container to top
+      const scrollableContainer = document.querySelector('.flex-1.overflow-y-auto');
+      if (scrollableContainer) {
+        scrollableContainer.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
   const prevDay = () => {
     if (currentDay > 0) {
       setCurrentDay(prev => prev - 1);
+      // Smooth scroll the scrollable content container to top
+      const scrollableContainer = document.querySelector('.flex-1.overflow-y-auto');
+      if (scrollableContainer) {
+        scrollableContainer.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
@@ -307,7 +317,7 @@ const Itinerary = () => {
             <Button onClick={generateAiItinerary} className="w-full neon-button">
               Try Again
             </Button>
-            <Button variant="outline" onClick={() => navigate("/landmarks", { state: { surveyData } })} className="w-full">
+            <Button variant="outline" onClick={() => navigate("/survey", { state: { surveyData, step: 6 } })} className="w-full">
               Go Back
             </Button>
           </div>
@@ -462,11 +472,11 @@ const Itinerary = () => {
         {/* Day Navigation */}
         <div className="flex items-center justify-between px-6 pb-3 flex-shrink-0">
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={prevDay}
             disabled={currentDay === 0}
-            className="interactive-scale"
+            className="interactive-scale bg-background/80 backdrop-blur-sm border-2 hover:bg-primary/10"
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -475,7 +485,7 @@ const Itinerary = () => {
             <div className="text-xl font-bold bg-gradient-neon bg-clip-text text-transparent">
               Day {currentDay + 1}
             </div>
-            <div className="flex gap-1 mt-1">
+            <div className="flex gap-1 mt-1 justify-center">
               {itinerary.map((_, index) => (
                 <div 
                   key={index}
@@ -488,11 +498,11 @@ const Itinerary = () => {
           </div>
 
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={nextDay}
             disabled={currentDay === itinerary.length - 1}
-            className="interactive-scale"
+            className="interactive-scale bg-background/80 backdrop-blur-sm border-2 hover:bg-primary/10"
           >
             <ChevronRight className="w-5 h-5" />
           </Button>
@@ -572,15 +582,28 @@ const Itinerary = () => {
               </div>
             </DialogContent>
           </Dialog>
-          
-          <Button
-            size="default"
-            onClick={handleShare}
-            className="flex-1 neon-button"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            Share
-          </Button>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="interactive-scale"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>AI Prompt Data</DialogTitle>
+              </DialogHeader>
+              <div className="overflow-auto max-h-[60vh]">
+                <pre className="text-xs bg-muted p-4 rounded-lg overflow-x-auto whitespace-pre-wrap">
+                  {JSON.stringify({ selectedLandmarks, surveyData }, null, 2)}
+                </pre>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Save Dialog */}

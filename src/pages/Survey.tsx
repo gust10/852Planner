@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ArrowLeft, ArrowRight, CalendarIcon } from "lucide-react";
+import getLandmarkImageUrl from '@/lib/landmarkImages';
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
@@ -20,6 +21,7 @@ interface SurveyData {
   totalPeople: number;
   totalBudget: number;
   styles: string[];
+  selectedLandmarks: string[];
   foodPreferences: {
     dietaryRestrictions: string[];
     cuisinePreferences: string[];
@@ -43,6 +45,7 @@ const Survey = () => {
           totalPeople: 1,
           totalBudget: 0,
           styles: [],
+          selectedLandmarks: [],
           foodPreferences: {
             dietaryRestrictions: [],
             cuisinePreferences: []
@@ -99,17 +102,96 @@ const Survey = () => {
       ]
     },
     {
+      title: t('landmarks.title'),
+      type: "landmarks",
+      key: "landmarks",
+      landmarks: [
+        {
+          id: "disneyland",
+          name: "Hong Kong Disneyland",
+          category: "Family",
+          rating: 4.5,
+          duration: "Full Day",
+          image: "🏰",
+          description: "Magical kingdom with thrilling rides and Disney characters",
+          tags: ["family", "entertainment"]
+        },
+        {
+          id: "victoria-peak",
+          name: "Victoria Peak",
+          category: "Views",
+          rating: 4.8,
+          duration: "3-4 hours",
+          image: "⛰️",
+          description: "Stunning panoramic views of Hong Kong skyline",
+          tags: ["city", "nature", "views"]
+        },
+        {
+          id: "victoria-harbour",
+          name: "Victoria Harbour",
+          category: "Waterfront",
+          rating: 4.7,
+          duration: "2-3 hours",
+          image: "🌊",
+          description: "Iconic harbour with Symphony of Lights show",
+          tags: ["city", "cultural", "nightlife"]
+        },
+        {
+          id: "ocean-park",
+          name: "Ocean Park",
+          category: "Theme Park",
+          rating: 4.4,
+          duration: "Full Day",
+          image: "🐋",
+          description: "Marine life theme park with exciting rides",
+          tags: ["family", "nature", "entertainment"]
+        },
+        {
+          id: "avenue-stars",
+          name: "Avenue of Stars",
+          category: "Cultural",
+          rating: 4.2,
+          duration: "1-2 hours",
+          image: "🌟",
+          description: "Waterfront promenade celebrating Hong Kong cinema",
+          tags: ["cultural", "city", "views"]
+        },
+        {
+          id: "dragons-back",
+          name: "Dragon's Back Trail",
+          category: "Hiking",
+          rating: 4.6,
+          duration: "4-5 hours",
+          image: "🐲",
+          description: "Spectacular hiking trail with coastal views",
+          tags: ["hiking", "nature", "adventure"]
+        },
+        {
+          id: "m-plus",
+          name: "M+ Museum",
+          category: "Museum",
+          rating: 4.3,
+          duration: "2-3 hours",
+          image: "🏛️",
+          description: "Contemporary visual culture museum",
+          tags: ["museums", "cultural", "art"]
+        },
+        {
+          id: "temple-street",
+          name: "Temple Street Night Market",
+          category: "Shopping",
+          rating: 4.1,
+          duration: "2-3 hours",
+          image: "🏮",
+          description: "Bustling night market for food and shopping",
+          tags: ["shopping", "foodie", "nightlife"]
+        }
+      ]
+    },
+    {
       title: "Any food preferences?",
       type: "foodPreferences",
       key: "foodPreferences",
-      dietaryOptions: [
-  { id: "vegetarian", label: "🥬 Vegetarian" },
-  { id: "vegan", label: "🌱 Vegan" },
-  { id: "halal", label: "☪️ Halal" },
-  { id: "kosher", label: "✡️ Kosher" },
-  { id: "keto", label: "🥑 Keto" },
-  { id: "pescatarian", label: "🐟 Pescatarian" }
-      ],
       cuisineOptions: [
         { id: "cantonese", label: "🥟 Dim Sum" },
         { id: "szechuan", label: "🌶️ Szechuan" },
@@ -170,6 +252,15 @@ const Survey = () => {
     });
   // State for showing max interests message
   const [showMaxInterests, setShowMaxInterests] = useState(false);
+  };
+
+  const handleLandmarkToggle = (landmarkId: string) => {
+    setSurveyData(prev => ({
+      ...prev,
+      selectedLandmarks: prev.selectedLandmarks.includes(landmarkId)
+        ? prev.selectedLandmarks.filter(id => id !== landmarkId)
+        : [...prev.selectedLandmarks, landmarkId]
+    }));
   };
 
   const handleBudgetChange = (value: string) => {
@@ -287,6 +378,9 @@ const Survey = () => {
     if (currentStepData.type === "multiSelect") {
       return surveyData.styles.length > 0;
     }
+    if (currentStepData.type === "landmarks") {
+      return true; // Optional step
+    }
     return true;
   };
 
@@ -306,7 +400,7 @@ const Survey = () => {
   };
 
   return (
-    <div className="min-h-screen h-screen overflow-hidden bg-gradient-hero flex flex-col">
+  <div className="min-h-screen overflow-hidden bg-gradient-hero flex flex-col">
       {/* Progress Bar */}
       <div className="w-full bg-muted/20 h-2">
         <div 
@@ -386,13 +480,13 @@ const Survey = () => {
 
           {currentStepData.type === "selection" && (
             <div className="flex justify-center">
-              <div className="grid grid-cols-2 gap-4 max-w-xs">
+              <div className="grid grid-cols-2 gap-4 w-full max-w-md">
                 {currentStepData.options?.map((option) => (
                   <Button
                     key={option}
                     variant={surveyData.companions === option ? "default" : "outline"}
                     size="lg"
-                    className={`interactive-scale text-center justify-center h-20 ${
+                    className={`interactive-scale text-center justify-center h-12 md:h-14 w-full ${
                       surveyData.companions === option ? "neon-button" : ""
                     }`}
                     onClick={() => handleSelectionClick(option)}
@@ -435,13 +529,13 @@ const Survey = () => {
               <div className="text-xs text-muted-foreground mb-2 text-center">
                 Choose up to 3 interests
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 w-full max-w-md">
                 {currentStepData.options?.map((option: any) => (
                   <Button
                     key={option.id}
                     variant={surveyData.styles.includes(option.id) ? "default" : "outline"}
-                    size="sm"
-                    className={`interactive-scale text-left justify-start h-auto py-4 text-xs ${
+                    size="lg"
+                    className={`interactive-scale text-left justify-start h-12 md:h-14 w-full text-xs ${
                       surveyData.styles.includes(option.id) ? "neon-button" : ""
                     }`}
                     onClick={() => handleMultiSelectToggle(option.id)}
@@ -456,30 +550,59 @@ const Survey = () => {
             </>
           )}
 
+          {currentStepData.type === "landmarks" && (
+            <div className="space-y-4">
+              <div className="text-xs text-muted-foreground mb-2 text-center">
+                Select landmarks you'd like to visit (optional)
+              </div>
+              <div className="max-h-80 overflow-y-auto space-y-3">
+                {currentStepData.landmarks?.map((landmark: any) => (
+                  <div
+                    key={landmark.id}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:scale-105 ${
+                      surveyData.selectedLandmarks.includes(landmark.id)
+                        ? "border-primary bg-primary/10"
+                        : "border-muted hover:border-primary/50"
+                    }`}
+                    onClick={() => handleLandmarkToggle(landmark.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-24 h-16 md:w-32 md:h-24 rounded-lg overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                        <img
+                          src={getLandmarkImageUrl(landmark.id)}
+                          alt={landmark.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.currentTarget as HTMLImageElement;
+                            // Already using imported assets; fallback to public placeholder
+                            if (!img.src.includes('placeholder.svg')) {
+                              img.src = '/landmarks/placeholder.svg';
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-sm truncate">{landmark.name}</h3>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            ⭐ {landmark.rating}
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">{landmark.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs bg-muted px-2 py-1 rounded">{landmark.category}</span>
+                          <span className="text-xs text-muted-foreground">{landmark.duration}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {currentStepData.type === "foodPreferences" && (
             <div className="space-y-3">
-              {/* Dietary Restrictions */}
-              <div className="mb-2">
-                <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
-                  Dietary Requirements (optional)
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {currentStepData.dietaryOptions?.map((option: any) => (
-                    <Button
-                      key={option.id}
-                      variant={surveyData.foodPreferences.dietaryRestrictions.includes(option.id) ? "default" : "outline"}
-                      size="sm"
-                      className={`h-auto py-2 px-2 text-xs transition-all duration-300 hover:scale-105 ${
-                        surveyData.foodPreferences.dietaryRestrictions.includes(option.id) ? "neon-button" : ""
-                      }`}
-                      onClick={() => handleFoodPreferenceToggle('dietaryRestrictions', option.id)}
-                    >
-                      {option.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
               {/* Cuisine Preferences */}
               <div className="mb-2">
                 <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
@@ -507,12 +630,12 @@ const Survey = () => {
         </div>
 
         {/* Fixed Navigation Buttons - Always at bottom */}
-  <div className="flex justify-between w-full gap-4 h-12 flex-shrink-0 sticky bottom-0 left-0 z-10 px-6 pb-4">
+  <div className="flex justify-between w-full gap-4 h-12 md:h-14 flex-shrink-0 sticky bottom-0 left-0 z-10 px-4 md:px-6 pb-4">
           <Button
             variant="outline"
             size="lg"
             onClick={handlePrev}
-            className="flex-1 interactive-scale h-12"
+              className="flex-1 interactive-scale h-12 md:h-14 w-full"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('survey.back')}

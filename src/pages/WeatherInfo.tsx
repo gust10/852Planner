@@ -125,7 +125,12 @@ const WeatherInfo = () => {
   ];
 
   const handleContinue = () => {
-    navigate("/landmarks", { state: { surveyData } });
+    navigate("/itinerary", { 
+      state: { 
+        surveyData,
+        selectedLandmarks: surveyData?.selectedLandmarks || []
+      } 
+    });
   };
 
   return (
@@ -137,7 +142,7 @@ const WeatherInfo = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/survey", { state: { surveyData, step: 5 } })}
+            onClick={() => navigate("/survey", { state: { surveyData, step: 6 } })}
             className="absolute left-0 top-4 p-2 hover:bg-muted/20 rounded-full transition-all duration-300 hover:scale-110"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -197,7 +202,7 @@ const WeatherInfo = () => {
           onClick={handleContinue}
           className="w-full mt-8 neon-button py-6 text-lg font-semibold rounded-2xl shadow-elevated"
         >
-          {t('landmarks.title')}
+          Create Itinerary
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </div>

@@ -8,7 +8,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Survey from "./pages/Survey";
 import WeatherInfo from "./pages/WeatherInfo";
-import Landmarks from "./pages/Landmarks";
 import Itinerary from "./pages/Itinerary";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -27,7 +26,6 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/survey" element={<Survey />} />
               <Route path="/weather-info" element={<WeatherInfo />} />
-              <Route path="/landmarks" element={<Landmarks />} />
               <Route path="/itinerary" element={<Itinerary />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
