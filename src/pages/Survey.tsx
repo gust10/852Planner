@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -29,19 +29,28 @@ interface SurveyData {
 const Survey = () => {
   const navigate = useNavigate();
   const { t } = useTranslations();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [surveyData, setSurveyData] = useState<SurveyData>({
-    dateRange: undefined,
-    timeRange: [9, 21],
-    companions: "",
-    totalPeople: 1,
-    totalBudget: 0,
-    styles: [],
-    foodPreferences: {
-      dietaryRestrictions: [],
-      cuisinePreferences: []
-    }
-  });
+  const location = useLocation();
+  const initialStep = (location.state && typeof location.state.step === 'number') ? location.state.step : 0;
+  const [currentStep, setCurrentStep] = useState(initialStep);
+
+  const [surveyData, setSurveyData] = useState<SurveyData>(
+    location.state && location.state.surveyData
+      ? location.state.surveyData
+      : {
+          dateRange: undefined,
+          timeRange: [9, 21],
+          companions: "",
+          totalPeople: 1,
+          totalBudget: 0,
+          styles: [],
+          foodPreferences: {
+            dietaryRestrictions: [],
+            cuisinePreferences: []
+          }
+        }
+  );
+  // State for showing max interests message
+  const [showMaxInterests, setShowMaxInterests] = useState(false);
 
   const steps = [
     {
@@ -64,8 +73,7 @@ const Survey = () => {
         t('survey.party.solo'),
         t('survey.party.couple'),
         t('survey.party.family'),
-        t('survey.party.friends'),
-        t('survey.party.business')
+        t('survey.party.friends')
       ]
     },
     {
@@ -78,16 +86,16 @@ const Survey = () => {
       type: "multiSelect",
       key: "styles",
       options: [
-        { id: "shopping", label: `🛍️ ${t('survey.interests.shopping')}`, color: "bg-gradient-primary" },
-        { id: "hiking", label: `🥾 ${t('survey.interests.nature')}`, color: "bg-gradient-secondary" },
-        { id: "foodie", label: `🍜 ${t('survey.interests.food')}`, color: "bg-gradient-neon" },
-        { id: "nature", label: `🌿 ${t('survey.interests.nature')}`, color: "bg-gradient-primary" },
-        { id: "city", label: `🏙️ ${t('survey.interests.culture')}`, color: "bg-gradient-secondary" },
-        { id: "cultural", label: `🏮 ${t('survey.interests.culture')}`, color: "bg-gradient-neon" },
-        { id: "nightlife", label: `🌙 ${t('survey.interests.nightlife')}`, color: "bg-gradient-primary" },
-        { id: "island", label: `🏝️ ${t('survey.interests.adventure')}`, color: "bg-gradient-secondary" },
-        { id: "family", label: `👨‍👩‍👧‍👦 ${t('survey.party.family')}`, color: "bg-gradient-neon" },
-        { id: "museums", label: `🏛️ ${t('survey.interests.culture')}`, color: "bg-gradient-primary" }
+  { id: "shopping", label: `🛍️ Shopping`, color: "bg-gradient-primary" },
+  { id: "hiking", label: `🌄 Hiking & Nature`, color: "bg-gradient-secondary" },
+  { id: "foodie", label: `🍜 Food & Dining`, color: "bg-gradient-neon" },
+        { id: "culture", label: `🏮 Culture & Heritage`, color: "bg-gradient-primary" },
+        { id: "nightlife", label: `🌃 Nightlife`, color: "bg-gradient-secondary" },
+        { id: "islands", label: `🏝️ Outlying Islands`, color: "bg-gradient-neon" },
+        { id: "family", label: `🎡 Family Attractions`, color: "bg-gradient-primary" },
+        { id: "museums", label: `🖼️ Museums & Art`, color: "bg-gradient-secondary" },
+        { id: "themeparks", label: `🎢 Theme Parks`, color: "bg-gradient-neon" },
+        { id: "waterfront", label: `🚤 Waterfront`, color: "bg-gradient-primary" }
       ]
     },
     {
@@ -95,14 +103,12 @@ const Survey = () => {
       type: "foodPreferences",
       key: "foodPreferences",
       dietaryOptions: [
-        { id: "vegetarian", label: "🥬 Vegetarian" },
-        { id: "vegan", label: "🌱 Vegan" },
-        { id: "halal", label: "☪️ Halal" },
-        { id: "kosher", label: "✡️ Kosher" },
-        { id: "gluten-free", label: "🌾 Gluten-Free" },
-        { id: "dairy-free", label: "🥛 Dairy-Free" },
-        { id: "keto", label: "🥑 Keto" },
-        { id: "pescatarian", label: "🐟 Pescatarian" }
+  { id: "vegetarian", label: "🥬 Vegetarian" },
+  { id: "vegan", label: "🌱 Vegan" },
+  { id: "halal", label: "☪️ Halal" },
+  { id: "kosher", label: "✡️ Kosher" },
+  { id: "keto", label: "🥑 Keto" },
+  { id: "pescatarian", label: "🐟 Pescatarian" }
       ],
       cuisineOptions: [
         { id: "cantonese", label: "🥟 Dim Sum" },
@@ -119,7 +125,9 @@ const Survey = () => {
     }
   ];
 
-  const currentStepData = steps[currentStep];
+  // Ensure currentStep is within bounds
+  const safeStep = Math.max(0, Math.min(currentStep, steps.length - 1));
+  const currentStepData = steps[safeStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   const handleTimeRangeChange = (value: number[]) => {
@@ -145,12 +153,23 @@ const Survey = () => {
   };
 
   const handleMultiSelectToggle = (styleId: string) => {
-    setSurveyData(prev => ({
-      ...prev,
-      styles: prev.styles.includes(styleId)
-        ? prev.styles.filter(s => s !== styleId)
-        : [...prev.styles, styleId]
-    }));
+    setSurveyData(prev => {
+      if (prev.styles.includes(styleId)) {
+        return {
+          ...prev,
+          styles: prev.styles.filter(s => s !== styleId)
+        };
+      } else if (prev.styles.length < 3) {
+        return {
+          ...prev,
+          styles: [...prev.styles, styleId]
+        };
+      } else {
+        return prev; // Do not add more than 3
+      }
+    });
+  // State for showing max interests message
+  const [showMaxInterests, setShowMaxInterests] = useState(false);
   };
 
   const handleBudgetChange = (value: string) => {
@@ -260,7 +279,7 @@ const Survey = () => {
       return surveyData.dateRange?.from && surveyData.dateRange?.to;
     }
     if (currentStepData.type === "selection") {
-      return surveyData.companions !== "" && surveyData.totalPeople > 0;
+      return surveyData.companions !== "";
     }
     if (currentStepData.type === "budget") {
       return surveyData.totalBudget > 0;
@@ -296,9 +315,9 @@ const Survey = () => {
         />
       </div>
 
-      <div className="flex-1 flex flex-col justify-center items-center p-6 max-w-md mx-auto w-full">
+      <div className="flex-1 flex flex-col p-6 max-w-md mx-auto w-full">
         {/* Step Counter */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 pt-4">
           <div className="text-muted-foreground text-sm mb-2">
             {t('survey.progress', { current: currentStep + 1, total: steps.length })}
           </div>
@@ -308,24 +327,27 @@ const Survey = () => {
         </div>
 
         {/* Question Content */}
-        <Card className={`w-full card-hover border-0 p-8 mb-8 animate-scale-in ${
-          currentStep === 2 || currentStep === 5 ? '' : 'max-h-[60vh] overflow-y-auto'
-        }`}>
+        <div className="flex-1 mb-6 flex items-center justify-center">
+          <Card className="w-full card-hover border-0 p-6 animate-scale-in">
           {currentStepData.type === "datePicker" && (
             <div className="space-y-4">
-              {/* Selected dates display */}
-              {surveyData.dateRange?.from && (
-                <div className="text-center space-y-2">
-                  <div className="text-sm text-muted-foreground">Selected dates:</div>
-                  <div className="text-lg font-semibold">
-                    {format(surveyData.dateRange.from, "MMM dd")}
-                    {surveyData.dateRange.to && surveyData.dateRange.to !== surveyData.dateRange.from && (
-                      <span> - {format(surveyData.dateRange.to, "MMM dd, yyyy")}</span>
-                    )}
-                    {!surveyData.dateRange.to && <span className="text-muted-foreground"> (select end date)</span>}
-                  </div>
-                </div>
-              )}
+              {/* Fixed height container for selected dates to prevent layout jump */}
+              <div className="text-center h-16 flex flex-col justify-center">
+                {surveyData.dateRange?.from ? (
+                  <>
+                    <div className="text-sm text-muted-foreground">Selected dates:</div>
+                    <div className="text-lg font-semibold">
+                      {format(surveyData.dateRange.from, "MMM dd")}
+                      {surveyData.dateRange.to && surveyData.dateRange.to !== surveyData.dateRange.from && (
+                        <span> - {format(surveyData.dateRange.to, "MMM dd, yyyy")}</span>
+                      )}
+                      {!surveyData.dateRange.to && <span className="text-muted-foreground"> (select end date)</span>}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-sm text-muted-foreground">Select your travel dates</div>
+                )}
+              </div>
 
               {/* Calendar */}
               <div className="flex justify-center">
@@ -363,47 +385,21 @@ const Survey = () => {
           )}
 
           {currentStepData.type === "selection" && (
-            <div className="space-y-6">
-              {/* Travel companion type selection */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-muted-foreground text-center">
-                  Travel Style
-                </h3>
-                <div className="grid gap-3">
-                  {currentStepData.options?.map((option) => (
-                    <Button
-                      key={option}
-                      variant={surveyData.companions === option ? "default" : "outline"}
-                      size="lg"
-                      className={`interactive-scale text-left justify-start h-auto py-4 ${
-                        surveyData.companions === option ? "neon-button" : ""
-                      }`}
-                      onClick={() => handleSelectionClick(option)}
-                    >
-                      {option}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Total number of people */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-muted-foreground text-center">
-                  {t('survey.party.total')}
-                </h3>
-                <div className="text-center">
-                  <Input
-                    type="number"
-                    placeholder={t('survey.party.total')}
-                    value={surveyData.totalPeople || ""}
-                    onChange={(e) => handlePeopleCountChange(e.target.value)}
-                    className="text-center text-xl font-semibold h-14 border-2 max-w-48 mx-auto"
-                    min="1"
-                  />
-                  <div className="text-xs text-muted-foreground mt-2">
-                    Including yourself
-                  </div>
-                </div>
+            <div className="flex justify-center">
+              <div className="grid grid-cols-2 gap-4 max-w-xs">
+                {currentStepData.options?.map((option) => (
+                  <Button
+                    key={option}
+                    variant={surveyData.companions === option ? "default" : "outline"}
+                    size="lg"
+                    className={`interactive-scale text-center justify-center h-20 ${
+                      surveyData.companions === option ? "neon-button" : ""
+                    }`}
+                    onClick={() => handleSelectionClick(option)}
+                  >
+                    {option}
+                  </Button>
+                ))}
               </div>
             </div>
           )}
@@ -435,28 +431,36 @@ const Survey = () => {
           )}
 
           {currentStepData.type === "multiSelect" && (
-            <div className="grid grid-cols-2 gap-3">
-              {currentStepData.options?.map((option: any) => (
-                <Button
-                  key={option.id}
-                  variant={surveyData.styles.includes(option.id) ? "default" : "outline"}
-                  size="sm"
-                  className={`interactive-scale text-left justify-start h-auto py-4 text-xs ${
-                    surveyData.styles.includes(option.id) ? "neon-button" : ""
-                  }`}
-                  onClick={() => handleMultiSelectToggle(option.id)}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
+            <>
+              <div className="text-xs text-muted-foreground mb-2 text-center">
+                Choose up to 3 interests
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {currentStepData.options?.map((option: any) => (
+                  <Button
+                    key={option.id}
+                    variant={surveyData.styles.includes(option.id) ? "default" : "outline"}
+                    size="sm"
+                    className={`interactive-scale text-left justify-start h-auto py-4 text-xs ${
+                      surveyData.styles.includes(option.id) ? "neon-button" : ""
+                    }`}
+                    onClick={() => handleMultiSelectToggle(option.id)}
+                    disabled={
+                      !surveyData.styles.includes(option.id) && surveyData.styles.length >= 3
+                    }
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </>
           )}
 
           {currentStepData.type === "foodPreferences" && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               {/* Dietary Restrictions */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
+              <div className="mb-2">
+                <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
                   Dietary Requirements (optional)
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -477,8 +481,8 @@ const Survey = () => {
               </div>
 
               {/* Cuisine Preferences */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
+              <div className="mb-2">
+                <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
                   Cuisine Interests (optional)
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -499,15 +503,16 @@ const Survey = () => {
               </div>
             </div>
           )}
-        </Card>
+          </Card>
+        </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between w-full gap-4">
+        {/* Fixed Navigation Buttons - Always at bottom */}
+  <div className="flex justify-between w-full gap-4 h-12 flex-shrink-0 sticky bottom-0 left-0 z-10 px-6 pb-4">
           <Button
             variant="outline"
             size="lg"
             onClick={handlePrev}
-            className="flex-1 interactive-scale"
+            className="flex-1 interactive-scale h-12"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t('survey.back')}
@@ -516,9 +521,9 @@ const Survey = () => {
             size="lg"
             onClick={handleNext}
             disabled={!canProceed()}
-            className="flex-1 neon-button"
+            className="flex-1 neon-button h-12"
           >
-            {currentStep === steps.length - 1 ? t('survey.submit') : t('survey.next')}
+            {currentStep === steps.length - 1 ? t('survey.next') : t('survey.next')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

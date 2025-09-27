@@ -129,31 +129,27 @@ const WeatherInfo = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
-      <div className="max-w-md mx-auto p-6">
+    <div className="min-h-screen h-screen bg-gradient-hero overflow-hidden">
+      <div className="max-w-md mx-auto p-3 h-full flex flex-col justify-between">
         {/* Header */}
-        <div className="relative text-center mb-8 pt-8">
+        <div className="relative text-center mb-4 pt-4">
           {/* Back Button */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/survey", { state: { surveyData } })}
-            className="absolute left-0 top-8 p-2 hover:bg-muted/20 rounded-full transition-all duration-300 hover:scale-110"
+            onClick={() => navigate("/survey", { state: { surveyData, step: 5 } })}
+            className="absolute left-0 top-4 p-2 hover:bg-muted/20 rounded-full transition-all duration-300 hover:scale-110"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3 animate-fade-in">
-            {t('weather.title')}
+            Trip Overview
           </h1>
-          <p className="text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Here's what to expect during your {surveyData?.days}-day adventure
-          </p>
         </div>
 
-        <div className="space-y-4">
+  <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Combined Weather Card - Full Width */}
-          <Card className="bg-gradient-card card-hover border border-border/50 p-6 animate-scale-in shadow-elevated">
+          <Card className="bg-gradient-card card-hover border border-border/50 p-6 animate-scale-in shadow-elevated flex-1">
             <h3 className="text-lg font-display font-semibold mb-4 text-center text-gradient">
               Daily Weather Forecast {error && <span className="text-xs text-muted-foreground">(Offline Mode)</span>}
             </h3>
@@ -178,38 +174,19 @@ const WeatherInfo = () => {
             )}
           </Card>
 
-          {/* Other Cards in 2x2 Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Crowd Level Card */}
-            <Card className="bg-gradient-card card-hover border border-border/50 p-4 animate-scale-in aspect-square flex flex-col justify-center shadow-card">
-              <div className="text-center">
-                <div className="p-3 bg-gradient-accent rounded-full w-fit mx-auto mb-3 shadow-glow">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-sm font-semibold mb-2">Crowd Levels</h3>
-                <p className="text-xl font-bold text-primary mb-2">{crowdData.level}</p>
-                <div className="text-xs">
-                  <div className="glass p-2 rounded-lg">
-                    <p className="font-medium text-primary">Best: 8-10AM</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Events Cards - Split into 2 */}
+          <div className="h-4" />
+          {/* Events Section - Large White Horizontally Scrollable */}
+          <div className="w-full bg-white rounded-2xl shadow-elevated p-4 mb-1 overflow-x-auto flex gap-4 flex-1 items-center" style={{ minHeight: '140px' }}>
             {events.map((event, index) => (
-              <Card key={index} className="card-hover border-0 p-4 animate-scale-in aspect-square flex flex-col justify-center">
-                <div className="text-center">
-                  <div className="p-3 bg-gradient-neon rounded-full w-fit mx-auto mb-3 shadow-glow">
-                    <Calendar className="w-6 h-6 text-accent-foreground" />
-                  </div>
-                  <h3 className="text-sm font-semibold mb-2">Events</h3>
-                  <div className="bg-muted/20 p-2 rounded-lg">
-                    <h4 className="font-semibold text-foreground text-xs mb-1">{event.name}</h4>
-                    <p className="text-xs text-primary">{event.date}</p>
-                  </div>
+              <div key={index} className="min-w-[220px] max-w-xs flex-shrink-0 flex flex-col justify-center items-center border border-border/20 rounded-xl p-4 shadow-card">
+                <div className="mb-3">
+                  <Calendar className="w-8 h-8 text-primary" />
                 </div>
-              </Card>
+                <h3 className="text-lg font-semibold mb-2 text-center">{event.name}</h3>
+                <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
+                <p className="text-sm text-foreground mb-2">{event.location}</p>
+                <p className="text-xs text-muted-foreground text-center">{event.description}</p>
+              </div>
             ))}
           </div>
         </div>
