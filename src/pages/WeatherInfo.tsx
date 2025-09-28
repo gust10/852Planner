@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Cloud, Sun, Users, Calendar, ArrowRight, ArrowLeft, CloudRain, CloudSnow } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
+import { events } from "@/lib/events";
 
 const WeatherInfo = () => {
   const location = useLocation();
@@ -14,7 +15,62 @@ const WeatherInfo = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const WEATHER_API_KEY = "50c6ebc8251d4ef8b5b102019252509";
+  const WEATHER_API_KEY = "235247215c10867579d72a3e7efb722fd9184b30";
+
+  // Filter events based on user's travel dates
+  const filteredEvents = useMemo(() => {
+    const dateRange = surveyData?.dateRange;
+    if (!dateRange?.from || !dateRange?.to) return events;
+
+    const travelStart = new Date(dateRange.from);
+    travelStart.setHours(0, 0, 0, 0);
+    const travelEnd = new Date(dateRange.to);
+    travelEnd.setHours(23, 59, 59, 999);
+
+    return events.filter(event => {
+      // Parse event date string (handles various formats like "01 Oct 2025", "05-07 Oct 2025", "04 Jul 2025 - 29 Mar 2026")
+      const parseEventDate = (dateStr: string) => {
+        // Handle date ranges like "04 Jul 2025 - 29 Mar 2026"
+        if (dateStr.includes(' - ')) {
+          const [startStr] = dateStr.split(' - ');
+          return new Date(startStr + (startStr.includes('2025') ? '' : ' 2025'));
+        }
+
+        // Handle date ranges like "05-07 Oct 2025"
+        if (dateStr.includes('-') && dateStr.split('-').length === 3) {
+          const parts = dateStr.split('-');
+          if (parts.length === 3) {
+            const startDay = parts[0].trim();
+            const monthYear = parts[2].trim();
+            return new Date(`${startDay} ${monthYear}`);
+          }
+        }
+
+        // Handle single dates like "01 Oct 2025"
+        return new Date(dateStr + (dateStr.includes('2025') ? '' : ' 2025'));
+      };
+
+      const eventStart = parseEventDate(event.date);
+      let eventEnd = eventStart;
+
+      // For date ranges, parse the end date
+      if (event.date.includes(' - ')) {
+        const [, endStr] = event.date.split(' - ');
+        eventEnd = new Date(endStr);
+      } else if (event.date.includes('-') && event.date.split('-').length === 3) {
+        // Handle "05-07 Oct 2025" format
+        const parts = event.date.split('-');
+        if (parts.length === 3) {
+          const endDay = parts[1].trim();
+          const monthYear = parts[2].trim();
+          eventEnd = new Date(`${endDay} ${monthYear}`);
+        }
+      }
+
+      // Check if event overlaps with travel dates
+      return eventStart <= travelEnd && eventEnd >= travelStart;
+    });
+  }, [surveyData?.dateRange]);
 
   const getWeatherIcon = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
@@ -109,21 +165,6 @@ const WeatherInfo = () => {
     bestTimes: ["8:00 AM - 10:00 AM", "4:00 PM - 6:00 PM"]
   };
 
-  const events = [
-    {
-      name: "Hong Kong Arts Festival",
-      date: "Running until next week",
-      location: "Various venues",
-      description: "World-class performances across the city"
-    },
-    {
-      name: "Night Markets",
-      date: "Every evening",
-      location: "Temple Street & Ladies' Market",
-      description: "Perfect for shopping and street food"
-    }
-  ];
-
   const handleContinue = () => {
     navigate("/itinerary", { 
       state: { 
@@ -153,46 +194,47 @@ const WeatherInfo = () => {
         </div>
 
   <div className="flex flex-col flex-1 overflow-y-auto">
-          {/* Combined Weather Card - Full Width */}
-          <Card className="bg-gradient-card card-hover border border-border/50 p-6 animate-scale-in shadow-elevated flex-1">
-            <h3 className="text-lg font-display font-semibold mb-4 text-center text-gradient">
-              Daily Weather Forecast {error && <span className="text-xs text-muted-foreground">(Offline Mode)</span>}
-            </h3>
-            {loading ? (
-              <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : (
-              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
-                {dailyWeather.map((day, index) => (
-                  <div key={index} className="flex-shrink-0 text-center min-w-[70px] p-3 bg-gradient-subtle rounded-xl border border-border/30 hover:shadow-subtle transition-all duration-300 hover:scale-105">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">{day.day}</p>
-                    <p className="text-xs text-muted-foreground mb-2">{day.date}</p>
-                    <div className="mb-2">
-                      <day.icon className="w-6 h-6 mx-auto text-primary animate-pulse" />
-                    </div>
-                    <p className="text-lg font-bold text-primary mb-1">{day.temperature}°</p>
-                    <p className="text-xs text-muted-foreground">{day.condition}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-
-          <div className="h-4" />
-          {/* Events Section - Large White Horizontally Scrollable */}
-          <div className="w-full bg-white rounded-2xl shadow-elevated p-4 mb-1 overflow-x-auto flex gap-4 flex-1 items-center" style={{ minHeight: '140px' }}>
-            {events.map((event, index) => (
-              <div key={index} className="min-w-[220px] max-w-xs flex-shrink-0 flex flex-col justify-center items-center border border-border/20 rounded-xl p-4 shadow-card">
-                <div className="mb-3">
-                  <Calendar className="w-8 h-8 text-primary" />
+          {/* Weather and Events Container - Split equally */}
+          <div className="flex flex-col flex-1 gap-4 min-h-0">
+            {/* Weather Section - Top Half */}
+            <Card className="bg-gradient-card card-hover border border-border/50 p-6 animate-scale-in shadow-elevated flex-[4] min-h-0">
+              <h3 className="text-lg font-display font-semibold mb-4 text-center text-gradient">
+                Daily Weather Forecast {error && <span className="text-xs text-muted-foreground">(Offline Mode)</span>}
+              </h3>
+              {loading ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-center">{event.name}</h3>
-                <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
-                <p className="text-sm text-foreground mb-2">{event.location}</p>
-                <p className="text-xs text-muted-foreground text-center">{event.description}</p>
-              </div>
-            ))}
+              ) : (
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
+                  {dailyWeather.map((day, index) => (
+                    <div key={index} className="flex-shrink-0 text-center min-w-[70px] p-3 bg-gradient-subtle rounded-xl border border-border/30 hover:shadow-subtle transition-all duration-300 hover:scale-105">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">{day.day}</p>
+                      <p className="text-xs text-muted-foreground mb-2">{day.date}</p>
+                      <div className="mb-2">
+                        <day.icon className="w-6 h-6 mx-auto text-primary animate-pulse" />
+                      </div>
+                      <p className="text-lg font-bold text-primary mb-1">{day.temperature}°</p>
+                      <p className="text-xs text-muted-foreground">{day.condition}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Events Section - Bottom Half */}
+            <div className="bg-white rounded-2xl shadow-elevated p-4 overflow-x-auto overflow-y-hidden flex gap-4 items-start flex-[6] min-h-0">
+              {filteredEvents.map((event, index) => (
+                <div key={index} className="w-64 flex-shrink-0 flex flex-col justify-center items-center border border-border/20 rounded-xl p-2 sm:p-4 shadow-card">
+                  <div className="mb-3 w-full">
+                    <img src={event.image} alt={event.name} className="w-full h-32 object-cover rounded-lg" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 text-center">{event.name}</h3>
+                  <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
+                  <p className="text-sm text-foreground mb-2">{event.location}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
