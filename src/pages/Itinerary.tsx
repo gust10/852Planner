@@ -51,7 +51,7 @@ const Itinerary = () => {
     try {
       const itineraryData = {
         user_id: user.id,
-        title: saveData.title || `Hong Kong Adventure - ${new Date().toLocaleDateString()}`,
+        title: saveData.title || `WonderPlan HK Adventure - ${new Date().toLocaleDateString()}`,
         description: saveData.description,
         survey_data: surveyData,
         selected_landmarks: selectedLandmarks,
@@ -680,7 +680,7 @@ const Itinerary = () => {
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
-                  placeholder="My Hong Kong Adventure"
+                  placeholder="My WonderPlan HK Adventure"
                   value={saveData.title}
                   onChange={(e) => setSaveData({ ...saveData, title: e.target.value })}
                 />
@@ -689,7 +689,7 @@ const Itinerary = () => {
                 <Label htmlFor="description">Description (optional)</Label>
                 <Textarea
                   id="description"
-                  placeholder="A memorable trip to Hong Kong..."
+                  placeholder="A memorable trip planned with WonderPlan HK..."
                   value={saveData.description}
                   onChange={(e) => setSaveData({ ...saveData, description: e.target.value })}
                 />

@@ -3,7 +3,7 @@
 ## Dashboard Method (Easiest)
 
 1. Go to https://app.supabase.com
-2. Select project: wonderPlanHK
+2. Select project: WonderPlan HK
 3. Go to Authentication → Settings
 4. Under "Email" section:
    - Turn OFF "Enable email confirmations"
