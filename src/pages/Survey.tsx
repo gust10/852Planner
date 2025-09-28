@@ -85,23 +85,6 @@ const Survey = () => {
       key: "totalBudget"
     },
     {
-      title: t('survey.interests.question'),
-      type: "multiSelect",
-      key: "styles",
-      options: [
-  { id: "shopping", label: `🛍️ Shopping`, color: "bg-gradient-primary" },
-  { id: "hiking", label: `🌄 Hiking & Nature`, color: "bg-gradient-secondary" },
-  { id: "foodie", label: `🍜 Food & Dining`, color: "bg-gradient-neon" },
-        { id: "culture", label: `🏮 Culture & Heritage`, color: "bg-gradient-primary" },
-        { id: "nightlife", label: `🌃 Nightlife`, color: "bg-gradient-secondary" },
-        { id: "islands", label: `🏝️ Outlying Islands`, color: "bg-gradient-neon" },
-        { id: "family", label: `🎡 Family Attractions`, color: "bg-gradient-primary" },
-        { id: "museums", label: `🖼️ Museums & Art`, color: "bg-gradient-secondary" },
-        { id: "themeparks", label: `🎢 Theme Parks`, color: "bg-gradient-neon" },
-        { id: "waterfront", label: `🚤 Waterfront`, color: "bg-gradient-primary" }
-      ]
-    },
-    {
       title: t('landmarks.title'),
       type: "landmarks",
       key: "landmarks",
@@ -186,6 +169,23 @@ const Survey = () => {
           description: "Bustling night market for food and shopping",
           tags: ["shopping", "foodie", "nightlife"]
         }
+      ]
+    },
+    {
+      title: t('survey.interests.question'),
+      type: "multiSelect",
+      key: "styles",
+      options: [
+  { id: "shopping", label: `🛍️ Shopping`, color: "bg-gradient-primary" },
+  { id: "hiking", label: `🌄 Hiking & Nature`, color: "bg-gradient-secondary" },
+  { id: "foodie", label: `🍜 Food & Dining`, color: "bg-gradient-neon" },
+        { id: "culture", label: `🏮 Culture & Heritage`, color: "bg-gradient-primary" },
+        { id: "nightlife", label: `🌃 Nightlife`, color: "bg-gradient-secondary" },
+        { id: "islands", label: `🏝️ Outlying Islands`, color: "bg-gradient-neon" },
+        { id: "family", label: `🎡 Family Attractions`, color: "bg-gradient-primary" },
+        { id: "museums", label: `🖼️ Museums & Art`, color: "bg-gradient-secondary" },
+        { id: "themeparks", label: `🎢 Theme Parks`, color: "bg-gradient-neon" },
+        { id: "waterfront", label: `🚤 Waterfront`, color: "bg-gradient-primary" }
       ]
     },
     {

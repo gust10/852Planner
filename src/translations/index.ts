@@ -59,7 +59,7 @@ export const translations = {
     
     // Other Pages
     'weather.title': 'Weather Information',
-    'landmarks.title': 'Popular Landmarks',
+    'landmarks.title': 'Select Popular Landmarks',
     'itinerary.title': 'Your Itinerary',
     'notfound.title': '404 - Page Not Found',
     'notfound.description': 'The page you are looking for does not exist.',
@@ -129,7 +129,7 @@ export const translations = {
     
     // Other Pages
     'weather.title': '天氣資訊',
-    'landmarks.title': '熱門地標',
+    'landmarks.title': '選擇熱門地標',
     'itinerary.title': '您的行程',
     'notfound.title': '404 - 找不到頁面',
     'notfound.description': '您尋找的頁面不存在。',
@@ -199,7 +199,7 @@ export const translations = {
     
     // Other Pages
     'weather.title': '天気情報',
-    'landmarks.title': '人気ランドマーク',
+    'landmarks.title': '人気ランドマークを選択',
     'itinerary.title': 'あなたの旅程',
     'notfound.title': '404 - ページが見つかりません',
     'notfound.description': 'お探しのページは存在しません。',
@@ -269,7 +269,7 @@ export const translations = {
     
     // Other Pages
     'weather.title': '날씨 정보',
-    'landmarks.title': '인기 명소',
+    'landmarks.title': '인기 명소 선택',
     'itinerary.title': '당신의 여행 계획',
     'notfound.title': '404 - 페이지를 찾을 수 없습니다',
     'notfound.description': '찾으시는 페이지가 존재하지 않습니다.',
@@ -339,7 +339,7 @@ export const translations = {
     
     // Other Pages
     'weather.title': 'Información del Tiempo',
-    'landmarks.title': 'Lugares Populares',
+    'landmarks.title': 'Seleccionar Lugares Populares',
     'itinerary.title': 'Su Itinerario',
     'notfound.title': '404 - Página No Encontrada',
     'notfound.description': 'La página que busca no existe.',
@@ -409,7 +409,7 @@ export const translations = {
     
     // Other Pages
     'weather.title': 'Informations Météo',
-    'landmarks.title': 'Sites Populaires',
+    'landmarks.title': 'Sélectionner Sites Populaires',
     'itinerary.title': 'Votre Itinéraire',
     'notfound.title': '404 - Page Non Trouvée',
     'notfound.description': 'La page que vous cherchez n\'existe pas.',
