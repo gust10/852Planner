@@ -86,13 +86,10 @@ const Itinerary = () => {
 
   // Generate AI-powered itinerary
   useEffect(() => {
-    if (!savedItinerary && selectedLandmarks && selectedLandmarks.length > 0) {
+    if (!savedItinerary) {
       generateAiItinerary();
-    } else if (!savedItinerary) {
-      setError('No landmarks selected');
-      setIsGenerating(false);
     }
-  }, [savedItinerary, selectedLandmarks]);
+  }, [savedItinerary]);
 
   const generateAiItinerary = async () => {
     try {
@@ -157,26 +154,60 @@ const Itinerary = () => {
         "temple-street-night-market": { name: "Temple Street Night Market", duration: "2-3 hours", coordinates: { lat: 22.3050, lng: 114.1714 } }
       };
       
-      const landmarksPerDay = Math.ceil(selectedLandmarks.length / days);
-      const fallbackItinerary = {
-        days: Array.from({ length: days }, (_, i) => ({
-          day: i + 1,
-          theme: `Day ${i + 1} Highlights`,
-          activities: selectedLandmarks.slice(i * landmarksPerDay, (i + 1) * landmarksPerDay).map((landmarkId: string, j: number) => {
-            const landmark = landmarkMap[landmarkId] || { name: landmarkId, duration: '2-3 hours' };
-            return {
+      // Create fallback itinerary based on whether landmarks are selected or not
+      let fallbackItinerary;
+      
+      if (selectedLandmarks && selectedLandmarks.length > 0) {
+        // Use selected landmarks for fallback
+        const landmarksPerDay = Math.ceil(selectedLandmarks.length / days);
+        fallbackItinerary = {
+          days: Array.from({ length: days }, (_, i) => ({
+            day: i + 1,
+            theme: `Day ${i + 1} Highlights`,
+            activities: selectedLandmarks.slice(i * landmarksPerDay, (i + 1) * landmarksPerDay).map((landmarkId: string, j: number) => {
+              const landmark = landmarkMap[landmarkId] || { name: landmarkId, duration: '2-3 hours' };
+              return {
+                time: `${(surveyData?.startTime || 9) + (j * 3)}:00 AM`,
+                duration: landmark.duration,
+                title: landmark.name,
+                description: `Explore this amazing Hong Kong attraction.`,
+                transportation: j === 0 ? 'Start here' : 'MTR (15-20 mins)',
+                cost: 'HK$100-300'
+                // No coordinates - will be fetched by fetch-images API from Google Places
+              };
+            })
+          })),
+          overallTips: ['Book tickets online', 'Use Octopus Card', 'Try local food']
+        };
+      } else {
+        // Create a general Hong Kong itinerary based on travel interests
+        const generalAttractions = [
+          { name: "Victoria Peak", duration: "3-4 hours", coordinates: { lat: 22.2708, lng: 114.1501 } },
+          { name: "Victoria Harbour", duration: "2-3 hours", coordinates: { lat: 22.2944, lng: 114.1722 } },
+          { name: "Avenue of Stars", duration: "1-2 hours", coordinates: { lat: 22.2944, lng: 114.1722 } },
+          { name: "Temple Street Night Market", duration: "2-3 hours", coordinates: { lat: 22.3050, lng: 114.1714 } },
+          { name: "Central District", duration: "2-3 hours", coordinates: { lat: 22.2783, lng: 114.1747 } },
+          { name: "Tsim Sha Tsui Promenade", duration: "1-2 hours", coordinates: { lat: 22.2944, lng: 114.1722 } }
+        ];
+        
+        const attractionsPerDay = Math.ceil(generalAttractions.length / days);
+        fallbackItinerary = {
+          days: Array.from({ length: days }, (_, i) => ({
+            day: i + 1,
+            theme: `Day ${i + 1} - Hong Kong Highlights`,
+            activities: generalAttractions.slice(i * attractionsPerDay, (i + 1) * attractionsPerDay).map((attraction, j: number) => ({
               time: `${(surveyData?.startTime || 9) + (j * 3)}:00 AM`,
-              duration: landmark.duration,
-              title: landmark.name,
-              description: `Explore this amazing Hong Kong attraction.`,
+              duration: attraction.duration,
+              title: attraction.name,
+              description: `Discover the best of Hong Kong at this popular attraction.`,
               transportation: j === 0 ? 'Start here' : 'MTR (15-20 mins)',
-              cost: 'HK$100-300'
+              cost: 'HK$50-200'
               // No coordinates - will be fetched by fetch-images API from Google Places
-            };
-          })
-        })),
-        overallTips: ['Book tickets online', 'Use Octopus Card', 'Try local food']
-      };
+            }))
+          })),
+          overallTips: ['Use Octopus Card for transportation', 'Try local dim sum', 'Check weather before outdoor activities']
+        };
+      }
       setAiItinerary(fallbackItinerary);
     } finally {
       setIsGenerating(false);
