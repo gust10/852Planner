@@ -111,9 +111,7 @@ const Itinerary = () => {
       }
 
       if (functionData?.success && functionData?.itinerary) {
-        setAiItinerary(functionData.itinerary);
-        
-        // Fetch images for all activities
+        // Fetch images and coordinates for all activities before setting the itinerary
         await fetchImagesForItinerary(functionData.itinerary);
         
         // Celebration confetti effect
@@ -172,8 +170,8 @@ const Itinerary = () => {
               title: landmark.name,
               description: `Explore this amazing Hong Kong attraction.`,
               transportation: j === 0 ? 'Start here' : 'MTR (15-20 mins)',
-              cost: 'HK$100-300',
-              coordinates: landmark.coordinates
+              cost: 'HK$100-300'
+              // No coordinates - will be fetched by fetch-images API from Google Places
             };
           })
         })),
@@ -202,11 +200,13 @@ const Itinerary = () => {
 
       if (imageError) {
         console.error('Error fetching images:', imageError);
+        // Still update with original itinerary if image fetch fails
+        setAiItinerary(itinerary);
         return;
       }
 
       if (imageData?.success && imageData?.activities) {
-        // Update the itinerary with image URLs
+        // Update the itinerary with image URLs and coordinates
         const updatedItinerary = {
           ...itinerary,
           days: itinerary.days.map((day: any) => ({
@@ -217,19 +217,30 @@ const Itinerary = () => {
               const globalActivityIndex = itinerary.days.slice(0, dayIndex).reduce((sum: number, d: any) => sum + (d.activities?.length || 0), 0) + activityIndex;
               const activityWithImage = imageData.activities[globalActivityIndex];
               
+              // Prioritize coordinates from Google Places API (fetch-images response)
+              const finalCoordinates = activityWithImage?.coordinates || activity.coordinates;
+              console.log(`[Itinerary] ${activity.title}: Using coordinates from ${activityWithImage?.coordinates ? 'Google Places API' : 'fallback'}: ${JSON.stringify(finalCoordinates)}`);
+              
               return {
                 ...activity,
-                imageUrl: activityWithImage?.imageUrl || null
+                imageUrl: activityWithImage?.imageUrl || null,
+                coordinates: finalCoordinates
               };
             })
           }))
         };
         
         setAiItinerary(updatedItinerary);
-        console.log('Successfully updated itinerary with images');
+        console.log('Successfully updated itinerary with images and coordinates');
+      } else {
+        // If no activities data returned, still set the original itinerary
+        console.log('No activities data returned, using original itinerary');
+        setAiItinerary(itinerary);
       }
     } catch (error) {
       console.error('Error in fetchImagesForItinerary:', error);
+      // Still update with original itinerary if fetch fails
+      setAiItinerary(itinerary);
     } finally {
       setIsFetchingImages(false);
     }
@@ -363,6 +374,7 @@ const Itinerary = () => {
             <Card className="card-hover border-0 overflow-hidden">
               <div className="h-64">
                 <Map 
+                  key={`map-day-${currentDay}-${JSON.stringify(currentDayData?.activities?.map(a => a.coordinates))}`}
                   activities={currentDayData?.activities || []} 
                   className="w-full h-full"
                 />
@@ -463,7 +475,7 @@ const Itinerary = () => {
                             }}
                           >
                             <ExternalLink className="w-3 h-3 mr-1" />
-                            {index === 0 ? 'Navigate Here' : 'Navigate Here'}
+                            {index === 0 ? 'Navigate Here' : 'Navigate From Previous'}
                           </Button>
                         </div>
                       </div>
