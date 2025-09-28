@@ -204,33 +204,7 @@ const WeatherInfo = () => {
     } catch (err) {
       console.error('Weather API error:', err);
       setError('Unable to load weather data');
-
-      // Fallback to mock data using the selected date range (start from trip start)
-      const dr = surveyData?.dateRange;
-      let mockStart = new Date();
-      let days = 7;
-      if (dr?.from && dr?.to) {
-        mockStart = new Date(dr.from);
-        mockStart.setHours(0, 0, 0, 0);
-        const mockEnd = new Date(dr.to);
-        mockEnd.setHours(23, 59, 59, 999);
-        days = Math.ceil((mockEnd.getTime() - mockStart.getTime()) / (1000 * 3600 * 24)) + 1;
-      }
-
-      console.log('Weather fallback - generating mock data from', mockStart, 'for', days, 'days');
-
-      const mockData = Array.from({ length: days }, (_, i) => {
-        const dayDate = new Date(mockStart.getTime() + i * 24 * 60 * 60 * 1000);
-        return {
-          day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][dayDate.getDay()],
-          date: dayDate.getDate(),
-          temperature: 22 + (i % 5),
-          condition: "Partly Cloudy",
-          humidity: 70,
-          icon: Sun
-        };
-      });
-      setDailyWeather(mockData);
+      setDailyWeather([]); // Clear any existing weather data
     } finally {
       setLoading(false);
     }
@@ -280,11 +254,17 @@ const WeatherInfo = () => {
             {/* Weather Section - Top Half */}
             <Card className="bg-gradient-card card-hover border border-border/50 p-6 animate-scale-in shadow-elevated flex-[4] min-h-0">
               <h3 className="text-lg font-display font-semibold mb-4 text-center text-gradient">
-                Daily Weather Forecast {error && <span className="text-xs text-muted-foreground">(Offline Mode)</span>}
+                Daily Weather Forecast
               </h3>
               {loading ? (
                 <div className="flex justify-center items-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Cloud className="w-12 h-12 text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground mb-2 text-center">Sorry, we currently can't get weather data</p>
+                  <p className="text-xs text-muted-foreground text-center">Weather information is temporarily unavailable</p>
                 </div>
               ) : (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">

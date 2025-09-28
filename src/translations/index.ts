@@ -37,6 +37,8 @@ export const translations = {
     'survey.party.friends': 'Group of Friends',
     'survey.party.business': 'Business Trip',
     'survey.party.total': 'Total number of people',
+    'survey.party.family.hint': 'Including adults and children',
+    'survey.party.friends.hint': 'Total number in your group',
     
     // Interests
     'survey.interests.question': 'What interests you most?',
@@ -122,6 +124,8 @@ export const translations = {
     'survey.party.friends': '朋友聚會',
     'survey.party.business': '商務出差',
     'survey.party.total': '總人數',
+    'survey.party.family.hint': '包括大人和小孩',
+    'survey.party.friends.hint': '團體總人數',
     
     // Interests
     'survey.interests.question': '您最感興趣的是什麼？',
@@ -207,6 +211,8 @@ export const translations = {
     'survey.party.friends': '友人グループ',
     'survey.party.business': '出張',
     'survey.party.total': '総人数',
+    'survey.party.family.hint': '大人と子供を含む',
+    'survey.party.friends.hint': 'グループの総人数',
     
     // Interests
     'survey.interests.question': '最も興味があるものは？',
@@ -292,6 +298,8 @@ export const translations = {
     'survey.party.friends': '친구들과',
     'survey.party.business': '출장',
     'survey.party.total': '총 인원',
+    'survey.party.family.hint': '성인과 어린이 포함',
+    'survey.party.friends.hint': '그룹 총 인원',
     
     // Interests
     'survey.interests.question': '가장 관심 있는 것은？',
@@ -377,6 +385,8 @@ export const translations = {
     'survey.party.friends': 'Grupo de Amigos',
     'survey.party.business': 'Viaje de Negocios',
     'survey.party.total': 'Número total de personas',
+    'survey.party.family.hint': 'Incluyendo adultos y niños',
+    'survey.party.friends.hint': 'Número total en el grupo',
     
     // Interests
     'survey.interests.question': '¿Qué le interesa más?',
@@ -462,6 +472,8 @@ export const translations = {
     'survey.party.friends': 'Groupe d\'Amis',
     'survey.party.business': 'Voyage d\'Affaires',
     'survey.party.total': 'Nombre total de personnes',
+    'survey.party.family.hint': 'Y compris adultes et enfants',
+    'survey.party.friends.hint': 'Nombre total dans le groupe',
     
     // Interests
     'survey.interests.question': 'Qu\'est-ce qui vous intéresse le plus ?',

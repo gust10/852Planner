@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { MapPin, Clock, Navigation, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Code, ExternalLink, Save, BookmarkPlus, Calendar, MessageSquare } from "lucide-react";
+import { MapPin, Clock, Navigation, ArrowLeft, ChevronLeft, ChevronRight, Loader2, Sparkles, Code, ExternalLink, Save, BookmarkPlus, Calendar, MessageSquare, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Map from "@/components/Map";
@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import confetti from 'canvas-confetti';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const Itinerary = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const Itinerary = () => {
     description: '',
     isPublic: false
   });
+  const [showExpenseChart, setShowExpenseChart] = useState(false);
 
   // Save itinerary to database
   const handleSaveItinerary = async () => {
@@ -336,6 +338,79 @@ const Itinerary = () => {
     }
   };
 
+  // Parse and categorize expenses from itinerary
+  const getExpenseData = () => {
+    if (!aiItinerary?.days) return [];
+
+    const expenseCategories: { [key: string]: number } = {};
+    const numberOfPeople = surveyData?.totalPeople || 1;
+    
+    aiItinerary.days.forEach((day: any) => {
+      day.activities?.forEach((activity: any) => {
+        if (activity.cost) {
+          // Parse cost string like "HK$100-300" or "HK$50-200"
+          const costMatch = activity.cost.match(/HK\$(\d+)-(\d+)/);
+          if (costMatch) {
+            const minCost = parseInt(costMatch[1]);
+            const maxCost = parseInt(costMatch[2]);
+            const avgCost = Math.round((minCost + maxCost) / 2);
+            
+            // Multiply by number of people
+            const totalCost = avgCost * numberOfPeople;
+            
+            // Categorize based on activity type
+            let category = 'Attractions';
+            const title = activity.title.toLowerCase();
+            const description = activity.description.toLowerCase();
+            
+            if (title.includes('disneyland') || title.includes('ocean park') || title.includes('theme')) {
+              category = 'Theme Parks';
+            } else if (title.includes('peak') || title.includes('harbour') || title.includes('view') || title.includes('museum') || title.includes('gallery')) {
+              category = 'Sightseeing';
+            } else if (title.includes('market') || title.includes('shopping') || title.includes('mall')) {
+              category = 'Shopping';
+            } else if (title.includes('food') || title.includes('dim sum') || title.includes('restaurant') || 
+                      title.includes('dining') || title.includes('lunch') || title.includes('dinner') || 
+                      title.includes('breakfast') || title.includes('eat') || title.includes('meal') ||
+                      title.includes('cafe') || title.includes('tea') || title.includes('bar') ||
+                      description.includes('food') || description.includes('dining') || description.includes('restaurant') ||
+                      description.includes('eat') || description.includes('meal')) {
+              category = 'Food & Dining';
+            } else if (title.includes('mtr') || title.includes('transport') || title.includes('bus') || 
+                      title.includes('ferry') || title.includes('taxi') || title.includes('metro') ||
+                      title.includes('subway') || title.includes('train')) {
+              category = 'Transportation';
+            }
+            
+            expenseCategories[category] = (expenseCategories[category] || 0) + totalCost;
+            
+            // Debug logging to understand categorization
+            console.log(`[Expense] "${activity.title}" -> ${category} (HK$${totalCost})`);
+          }
+        }
+      });
+    });
+
+    // Convert to chart data format
+    return Object.entries(expenseCategories).map(([category, amount]) => ({
+      category,
+      amount,
+      percentage: 0 // Will be calculated below
+    })).map(item => {
+      const total = Object.values(expenseCategories).reduce((sum, amt) => sum + amt, 0);
+      return {
+        ...item,
+        percentage: Math.round((item.amount / total) * 100)
+      };
+    });
+  };
+
+  const expenseData = getExpenseData();
+  const totalExpenses = expenseData.reduce((sum, item) => sum + item.amount, 0);
+
+  // Colors for the chart
+  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0'];
+
   // Loading state
   if (isGenerating) {
     return (
@@ -628,17 +703,90 @@ const Itinerary = () => {
                 size="icon"
                 className="interactive-scale"
               >
-                <Code className="w-4 h-4" />
+                <DollarSign className="w-4 h-4" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[80vh]">
+            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>AI Generated JSON</DialogTitle>
+                <DialogTitle>Expense Breakdown</DialogTitle>
+                <DialogDescription>
+                  Estimated costs for your itinerary activities
+                  {surveyData?.totalPeople > 1 && (
+                    <span className="block text-xs mt-1">
+                      Calculated for {surveyData.totalPeople} people
+                    </span>
+                  )}
+                  <span className="block text-xs mt-1 text-muted-foreground font-medium">
+                    * This is just a raw estimation! *
+                  </span>
+                </DialogDescription>
               </DialogHeader>
-              <div className="overflow-auto max-h-[60vh]">
-                <pre className="text-xs bg-muted p-4 rounded-lg overflow-x-auto whitespace-pre-wrap">
-                  {JSON.stringify(aiItinerary, null, 2)}
-                </pre>
+              <div className="space-y-4">
+                {expenseData.length > 0 ? (
+                  <>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary">
+                        HK${totalExpenses.toLocaleString()}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Total estimated cost</p>
+                    </div>
+                    
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={expenseData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ percentage }) => `${percentage}%`}
+                            outerRadius={70}
+                            fill="#8884d8"
+                            dataKey="amount"
+                          >
+                            {expenseData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value, name, props) => {
+                            const numberOfPeople = surveyData?.totalPeople || 1;
+                            const totalCost = Number(value);
+                            const costPerPerson = Math.round(totalCost / numberOfPeople);
+                            return [
+                              `HK$${totalCost.toLocaleString()}${numberOfPeople > 1 ? ` (HK$${costPerPerson.toLocaleString()}/person)` : ''}`, 
+                              'Amount'
+                            ];
+                          }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm">Category Breakdown</h4>
+                      {expenseData.map((item, index) => (
+                        <div key={item.category} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div 
+                              className="w-3 h-3 rounded-full flex-shrink-0" 
+                              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                            />
+                            <span className="truncate">{item.category}</span>
+                          </div>
+                          <div className="text-right flex-shrink-0 ml-2">
+                            <div className="font-medium">HK${item.amount.toLocaleString()}</div>
+                            <div className="text-xs text-muted-foreground">{item.percentage}%</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No expense data available</p>
+                    <p className="text-xs text-muted-foreground mt-1">Cost estimates will appear here when available</p>
+                  </div>
+                )}
               </div>
             </DialogContent>
           </Dialog>
