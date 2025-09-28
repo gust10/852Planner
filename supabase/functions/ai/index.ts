@@ -251,7 +251,94 @@ serve(async (req)=>{
     }
     
     // --- Create a detailed prompt for AI itinerary generation ---
-    const landmarkNames = selectedLandmarks.map((l: any) => l.name).join(', ');
+    
+    // Define all available landmarks with full details
+    const allLandmarks = [
+      {
+        id: "disneyland",
+        name: "Hong Kong Disneyland",
+        category: "Family",
+        rating: 4.5,
+        duration: "Full Day",
+        description: "Magical kingdom with thrilling rides and Disney characters",
+        tags: ["family", "entertainment"]
+      },
+      {
+        id: "victoria-peak",
+        name: "Victoria Peak",
+        category: "Views",
+        rating: 4.8,
+        duration: "3-4 hours",
+        description: "Stunning panoramic views of Hong Kong skyline",
+        tags: ["city", "nature", "views"]
+      },
+      {
+        id: "victoria-harbour",
+        name: "Victoria Harbour",
+        category: "Waterfront",
+        rating: 4.7,
+        duration: "2-3 hours",
+        description: "Iconic harbour with Symphony of Lights show",
+        tags: ["city", "cultural", "nightlife"]
+      },
+      {
+        id: "ocean-park",
+        name: "Ocean Park",
+        category: "Theme Park",
+        rating: 4.4,
+        duration: "Full Day",
+        description: "Marine life theme park with exciting rides",
+        tags: ["family", "nature", "entertainment"]
+      },
+      {
+        id: "avenue-of-stars",
+        name: "Avenue of Stars",
+        category: "Cultural",
+        rating: 4.2,
+        duration: "1-2 hours",
+        description: "Waterfront promenade celebrating Hong Kong cinema",
+        tags: ["cultural", "city", "views"]
+      },
+      {
+        id: "dragons-back",
+        name: "Dragon's Back Trail",
+        category: "Hiking",
+        rating: 4.6,
+        duration: "4-5 hours",
+        description: "Spectacular hiking trail with coastal views",
+        tags: ["hiking", "nature", "adventure"]
+      },
+      {
+        id: "m-plus-museum",
+        name: "M+ Museum",
+        category: "Museum",
+        rating: 4.3,
+        duration: "2-3 hours",
+        description: "Contemporary visual culture museum",
+        tags: ["museums", "cultural", "art"]
+      },
+      {
+        id: "temple-street-night-market",
+        name: "Temple Street Night Market",
+        category: "Shopping",
+        rating: 4.1,
+        duration: "2-3 hours",
+        description: "Bustling night market for food and shopping",
+        tags: ["shopping", "foodie", "nightlife"]
+      }
+    ];
+    
+    // Map selected landmark IDs to full landmark objects
+    const selectedLandmarkObjects = selectedLandmarks
+      .map((landmarkId: string) => allLandmarks.find(landmark => landmark.id === landmarkId))
+      .filter(Boolean); // Remove any undefined results
+    
+    const landmarkNames = selectedLandmarkObjects.map((l: any) => l.name).join(', ');
+    
+    // Create detailed landmark information for the AI
+    const landmarkDetails = selectedLandmarkObjects.map((landmark: any) => {
+      return `${landmark.name} (${landmark.category}, ${landmark.duration}, Rating: ${landmark.rating}/5) - ${landmark.description}`;
+    }).join('\n          ');
     const travelStyle = surveyData?.travelStyle || 'balanced';
     const companions = surveyData?.companions || 'solo';
     let days = 3; // default fallback
@@ -267,7 +354,22 @@ serve(async (req)=>{
     const startTime = surveyData?.startTime || 9;
     const dailyHours = surveyData?.dailyHours || 8;
     
+    // Extract budget and cuisine preferences
+    const totalBudget = surveyData?.totalBudget || 0;
+    const dailyBudget = totalBudget > 0 ? Math.round(totalBudget / days) : 0;
+    const cuisinePreferences = surveyData?.foodPreferences?.cuisinePreferences || [];
+    const styles = surveyData?.styles || [];
+    
     const systemInstruction = `Generate a Hong Kong itinerary in valid JSON format. Include lunch and dinner for each day. Keep descriptions concise.
+
+IMPORTANT REQUIREMENTS:
+- MUST include ALL selected landmarks in the itinerary - these are the user's top priorities
+- Respect the user's budget constraints if provided
+- Match cuisine preferences for restaurant recommendations
+- Include specific restaurant names and locations
+- Provide realistic cost estimates in HK$ and USD
+- Consider travel interests when planning activities
+- Use the provided landmark details (duration, category, description) to plan realistic timing
 
 REQUIRED JSON FORMAT:
 {
@@ -282,7 +384,7 @@ REQUIRED JSON FORMAT:
           "title": "Activity Name",
           "description": "Brief description",
           "transportation": "MTR/Taxi/Walk",
-          "cost": "HK$50-200",
+          "cost": "HK$50-200 ($7-26 USD)",
           "coordinates": {"lat": 22.3193, "lng": 114.1694}
         }
       ]
@@ -298,8 +400,17 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no explanations, just the JSON o
           Travel Style: ${travelStyle}
           Companions: ${companions}
           Daily Time Frame: ${startTime}:00 AM to ${startTime + dailyHours}:00 PM
-          Must-visit attractions: ${landmarkNames}
-          Dining preferences: Include specific restaurants for lunch and dinner.
+          
+          SELECTED LANDMARKS (MUST ALL BE INCLUDED):
+          ${landmarkDetails}
+          
+          ${totalBudget > 0 ? `Total Budget: $${totalBudget} USD (Daily Budget: $${dailyBudget} USD)` : 'Budget: Flexible'}
+          ${cuisinePreferences.length > 0 ? `Cuisine Preferences: ${cuisinePreferences.join(', ')}` : ''}
+          ${styles.length > 0 ? `Travel Interests: ${styles.join(', ')}` : ''}
+          
+          CRITICAL: Every single landmark listed above MUST appear in the itinerary. Use their provided durations and descriptions to plan realistic schedules.
+          Dining preferences: Include specific restaurants for lunch and dinner${cuisinePreferences.length > 0 ? ` that match the cuisine preferences` : ''}.
+          ${dailyBudget > 0 ? `Keep all activities and dining within the daily budget of $${dailyBudget} USD.` : ''}
         `;
     
     // --- Call Vertex AI API using REST ---

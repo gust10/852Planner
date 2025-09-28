@@ -146,19 +146,36 @@ const Itinerary = () => {
         const endDate = new Date(surveyData.dateRange.to);
         days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
       }
+      
+      // Define landmarks mapping for fallback
+      const landmarkMap: { [key: string]: { name: string; duration: string; coordinates?: { lat: number; lng: number } } } = {
+        "disneyland": { name: "Hong Kong Disneyland", duration: "Full Day", coordinates: { lat: 22.3129, lng: 114.0413 } },
+        "victoria-peak": { name: "Victoria Peak", duration: "3-4 hours", coordinates: { lat: 22.2708, lng: 114.1501 } },
+        "victoria-harbour": { name: "Victoria Harbour", duration: "2-3 hours", coordinates: { lat: 22.2944, lng: 114.1722 } },
+        "ocean-park": { name: "Ocean Park", duration: "Full Day", coordinates: { lat: 22.2462, lng: 114.1800 } },
+        "avenue-of-stars": { name: "Avenue of Stars", duration: "1-2 hours", coordinates: { lat: 22.2944, lng: 114.1722 } },
+        "dragons-back": { name: "Dragon's Back Trail", duration: "4-5 hours", coordinates: { lat: 22.2193, lng: 114.2694 } },
+        "m-plus-museum": { name: "M+ Museum", duration: "2-3 hours", coordinates: { lat: 22.3037, lng: 114.1608 } },
+        "temple-street-night-market": { name: "Temple Street Night Market", duration: "2-3 hours", coordinates: { lat: 22.3050, lng: 114.1714 } }
+      };
+      
       const landmarksPerDay = Math.ceil(selectedLandmarks.length / days);
       const fallbackItinerary = {
         days: Array.from({ length: days }, (_, i) => ({
           day: i + 1,
           theme: `Day ${i + 1} Highlights`,
-          activities: selectedLandmarks.slice(i * landmarksPerDay, (i + 1) * landmarksPerDay).map((landmark: any, j: number) => ({
-            time: `${(surveyData?.startTime || 9) + (j * 3)}:00 AM`,
-            duration: landmark.duration || '2-3 hours',
-            title: landmark.name,
-            description: `Explore this amazing Hong Kong attraction.`,
-            transportation: j === 0 ? 'Start here' : 'MTR (15-20 mins)',
-            cost: 'HK$100-300'
-          }))
+          activities: selectedLandmarks.slice(i * landmarksPerDay, (i + 1) * landmarksPerDay).map((landmarkId: string, j: number) => {
+            const landmark = landmarkMap[landmarkId] || { name: landmarkId, duration: '2-3 hours' };
+            return {
+              time: `${(surveyData?.startTime || 9) + (j * 3)}:00 AM`,
+              duration: landmark.duration,
+              title: landmark.name,
+              description: `Explore this amazing Hong Kong attraction.`,
+              transportation: j === 0 ? 'Start here' : 'MTR (15-20 mins)',
+              cost: 'HK$100-300',
+              coordinates: landmark.coordinates
+            };
+          })
         })),
         overallTips: ['Book tickets online', 'Use Octopus Card', 'Try local food']
       };
