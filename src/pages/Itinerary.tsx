@@ -31,6 +31,7 @@ const Itinerary = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFetchingImages, setIsFetchingImages] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingSaveAfterAuth, setPendingSaveAfterAuth] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(!!itineraryId);
@@ -92,6 +93,14 @@ const Itinerary = () => {
       generateAiItinerary();
     }
   }, [savedItinerary]);
+
+  // Auto-save after authentication
+  useEffect(() => {
+    if (user && pendingSaveAfterAuth && aiItinerary) {
+      setPendingSaveAfterAuth(false);
+      setShowSaveDialog(true);
+    }
+  }, [user, pendingSaveAfterAuth, aiItinerary]);
 
   const generateAiItinerary = async () => {
     try {
@@ -676,6 +685,7 @@ const Itinerary = () => {
               size="default"
               onClick={() => {
                 if (!user) {
+                  setPendingSaveAfterAuth(true);
                   setShowAuthModal(true);
                 } else {
                   setShowSaveDialog(true);
