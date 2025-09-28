@@ -12,6 +12,11 @@ const Index = () => {
 
   return (
     <div className="h-screen bg-gradient-hero flex flex-col items-center justify-center px-6 overflow-hidden relative">
+      {/* Logo in top left */}
+      <div className="absolute top-6 left-6 z-10">
+        <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
+      </div>
+
       {/* Header with User Menu and Language Selector */}
       <div className="absolute top-6 right-6 z-10 flex items-center gap-4">
         <UserMenu />
@@ -22,10 +27,7 @@ const Index = () => {
         {/* Main heading */}
         <div className="space-y-4">
           <h1 className="text-5xl md:text-6xl font-display font-bold text-foreground leading-tight">
-            {t('main.title')}
-            <span className="text-gradient block">
-              {t('main.subtitle')}
-            </span>
+            HK Wonder<span className="text-red-500">Plan</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground font-light">
             {t('main.description')}

@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { Calendar, MapPin, Clock, Trash2, Eye, Plus, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Clock, Trash2, Eye, ArrowLeft } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -153,8 +153,7 @@ const Dashboard: React.FC = () => {
               <p className="text-muted-foreground">Manage your saved Hong Kong adventures</p>
             </div>
           </div>
-          <Button onClick={() => navigate('/')} className="neon-button">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button onClick={() => navigate('/')} className="neon-button px-8">
             Create New
           </Button>
         </div>
@@ -202,10 +201,6 @@ const Dashboard: React.FC = () => {
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
                       <span>{getDuration(itinerary.start_date, itinerary.end_date)}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      <span>{getLandmarksCount(itinerary.selected_landmarks)} spots</span>
                     </div>
                   </div>
 
