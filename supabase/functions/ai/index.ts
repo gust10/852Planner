@@ -108,6 +108,11 @@ function repairJSON(jsonString: string): string {
   // Remove any trailing commas before closing brackets/braces
   repaired = repaired.replace(/,(\s*[}\]])/g, '$1');
   
+  // Fix common array issues - missing commas between array elements
+  repaired = repaired.replace(/(})(\s*{)/g, '$1,$2');
+  repaired = repaired.replace(/("])(\s*")/g, '$1,$2');
+  repaired = repaired.replace(/(\d)(\s*{)/g, '$1,$2');
+  
   // Try to find and fix unterminated strings
   const lines = repaired.split('\n');
   for (let i = 0; i < lines.length; i++) {
@@ -180,13 +185,25 @@ function aggressiveJSONRepair(jsonString: string): string {
     throw new Error('No JSON object found');
   }
   
+  // More aggressive cleaning
+  content = content.substring(startIndex);
+  
+  // Fix common array and object separation issues
+  content = content.replace(/(})(\s*)({)/g, '$1,$2$3'); // Add commas between objects
+  content = content.replace(/(\])(\s*)(\[)/g, '$1,$2$3'); // Add commas between arrays
+  content = content.replace(/(["\d}\]])(\s*)(["\[{])/g, '$1,$2$3'); // General comma fixes
+  
+  // Remove duplicate commas
+  content = content.replace(/,+/g, ',');
+  content = content.replace(/,\s*([}\]])/g, '$1');
+  
   // Find the last complete JSON structure
   let braceCount = 0;
   let lastValidIndex = -1;
   let inString = false;
   let escaped = false;
   
-  for (let i = startIndex; i < content.length; i++) {
+  for (let i = 0; i < content.length; i++) {
     const char = content[i];
     
     if (escaped) {
@@ -217,8 +234,8 @@ function aggressiveJSONRepair(jsonString: string): string {
     }
   }
   
-  if (lastValidIndex > startIndex) {
-    return content.substring(startIndex, lastValidIndex + 1);
+  if (lastValidIndex > 0) {
+    return content.substring(0, lastValidIndex + 1);
   }
   
   // If no complete object found, try to construct one from available data
@@ -246,9 +263,7 @@ serve(async (req)=>{
     
     // --- Get user input ---
     const { selectedLandmarks, surveyData } = await req.json();
-    if (!selectedLandmarks || selectedLandmarks.length === 0) {
-      throw new Error('No landmarks selected');
-    }
+    const landmarks = selectedLandmarks || [];
     
     // --- Create a detailed prompt for AI itinerary generation ---
     
@@ -329,16 +344,18 @@ serve(async (req)=>{
     ];
     
     // Map selected landmark IDs to full landmark objects
-    const selectedLandmarkObjects = selectedLandmarks
+    const selectedLandmarkObjects = landmarks
       .map((landmarkId: string) => allLandmarks.find(landmark => landmark.id === landmarkId))
       .filter(Boolean); // Remove any undefined results
     
     const landmarkNames = selectedLandmarkObjects.map((l: any) => l.name).join(', ');
     
     // Create detailed landmark information for the AI
-    const landmarkDetails = selectedLandmarkObjects.map((landmark: any) => {
-      return `${landmark.name} (${landmark.category}, ${landmark.duration}, Rating: ${landmark.rating}/5) - ${landmark.description}`;
-    }).join('\n          ');
+    const landmarkDetails = selectedLandmarkObjects.length > 0 
+      ? selectedLandmarkObjects.map((landmark: any) => {
+          return `${landmark.name} (${landmark.category}, ${landmark.duration}, Rating: ${landmark.rating}/5) - ${landmark.description}`;
+        }).join('\n          ')
+      : 'No specific landmarks selected - recommend popular attractions based on travel interests';
     const travelStyle = surveyData?.travelStyle || 'balanced';
     const companions = surveyData?.companions || 'solo';
     let days = 3; // default fallback
@@ -363,7 +380,8 @@ serve(async (req)=>{
     const systemInstruction = `Generate a Hong Kong itinerary in valid JSON format. Include lunch and dinner for each day. Keep descriptions concise.
 
 IMPORTANT REQUIREMENTS:
-- MUST include ALL selected landmarks in the itinerary - these are the user's top priorities
+- If landmarks are selected, MUST include ALL selected landmarks in the itinerary - these are the user's top priorities
+- If no landmarks are selected, recommend popular Hong Kong attractions based on the user's travel interests and preferences
 - Respect the user's budget constraints if provided
 - Match cuisine preferences for restaurant recommendations
 - Include specific restaurant names WITH EXACT BRANCH LOCATIONS (e.g., "Tim Ho Wan - Central Station", "Maxim's Palace - City Hall", "Kam Wah Cafe - Mong Kok Branch")
@@ -410,14 +428,16 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no explanations, just the JSON o
           Companions: ${companions}
           Daily Time Frame: ${startTime}:00 AM to ${startTime + dailyHours}:00 PM
           
-          SELECTED LANDMARKS (MUST ALL BE INCLUDED):
+          ${selectedLandmarkObjects.length > 0 ? 'SELECTED LANDMARKS (MUST ALL BE INCLUDED):' : 'ATTRACTION RECOMMENDATIONS NEEDED:'}
           ${landmarkDetails}
           
           ${totalBudget > 0 ? `Total Budget: $${totalBudget} USD (Daily Budget: $${dailyBudget} USD)` : 'Budget: Flexible'}
           ${cuisinePreferences.length > 0 ? `Cuisine Preferences: ${cuisinePreferences.join(', ')}` : ''}
           ${styles.length > 0 ? `Travel Interests: ${styles.join(', ')}` : ''}
           
-          CRITICAL: Every single landmark listed above MUST appear in the itinerary. Use their provided durations and descriptions to plan realistic schedules.
+          ${selectedLandmarkObjects.length > 0 
+            ? 'CRITICAL: Every single landmark listed above MUST appear in the itinerary. Use their provided durations and descriptions to plan realistic schedules.' 
+            : 'CRITICAL: Since no specific landmarks were selected, recommend the best Hong Kong attractions that match the travel interests and preferences above. Include popular must-see attractions, hidden gems, and experiences that align with the user\'s style.'}
           Dining preferences: Include specific restaurants for lunch and dinner${cuisinePreferences.length > 0 ? ` that match the cuisine preferences` : ''}.
           ${dailyBudget > 0 ? `Keep all activities and dining within the daily budget of $${dailyBudget} USD.` : ''}
         `;
@@ -437,8 +457,8 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no explanations, just the JSON o
         }
       ],
       generationConfig: {
-        temperature: 0.7,
-        topP: 0.9,
+        temperature: 0.3,
+        topP: 0.8,
         maxOutputTokens: 4096,
         responseMimeType: "application/json"
       }
@@ -485,8 +505,16 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no explanations, just the JSON o
       
     } catch (parseError) {
       console.log('Failed to parse JSON from AI response:', parseError.message);
+      
+      // Extract position from error message if available
+      let errorPos = 0;
+      const posMatch = parseError.message.match(/position (\d+)/);
+      if (posMatch) {
+        errorPos = parseInt(posMatch[1]);
+      }
+      
       console.log('Problematic content around error position:', 
-        itineraryContent.substring(Math.max(0, 7643 - 200), 7643 + 200));
+        itineraryContent.substring(Math.max(0, errorPos - 200), errorPos + 200));
       
       // Try one more aggressive repair attempt
       try {
@@ -496,37 +524,71 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no explanations, just the JSON o
       } catch (secondError) {
         console.log('Aggressive repair also failed, using fallback structure');
         
-        // Create a fallback structure
+        // Create a fallback structure based on user preferences
+        const fallbackActivities: any[] = [];
+        
+        // Add selected landmarks if any
+        if (selectedLandmarkObjects.length > 0) {
+          selectedLandmarkObjects.forEach((landmark, index) => {
+            fallbackActivities.push({
+              time: `${(startTime || 9) + (index * 3)}:00 AM`,
+              duration: landmark.duration || "2-3 hours",
+              title: landmark.name,
+              description: landmark.description || "Explore this amazing Hong Kong attraction",
+              transportation: index === 0 ? "Start here" : "MTR",
+              cost: "HK$50-200"
+            });
+          });
+        } else {
+          // Use general attractions based on user interests
+          const generalAttractions = [
+            { name: "Victoria Peak", description: "Iconic Hong Kong skyline views", duration: "3-4 hours" },
+            { name: "Victoria Harbour", description: "Stunning waterfront views", duration: "2-3 hours" },
+            { name: "Central District", description: "Business and shopping district", duration: "2-3 hours" }
+          ];
+          
+          generalAttractions.forEach((attraction, index) => {
+            fallbackActivities.push({
+              time: `${(startTime || 9) + (index * 3)}:00 AM`,
+              duration: attraction.duration,
+              title: attraction.name,
+              description: attraction.description,
+              transportation: index === 0 ? "Start here" : "MTR",
+              cost: "HK$50-200"
+            });
+          });
+        }
+        
+        // Add meals
+        fallbackActivities.push({
+          time: "12:00 PM",
+          duration: "1 hour",
+          title: "Dim Sum Lunch",
+          description: "Traditional Cantonese dim sum experience",
+          transportation: "Walk",
+          cost: "HK$100-200"
+        });
+        
+        fallbackActivities.push({
+          time: "7:00 PM",
+          duration: "1.5 hours",
+          title: "Local Restaurant Dinner",
+          description: "Authentic Hong Kong cuisine",
+          transportation: "MTR",
+          cost: "HK$150-300"
+        });
+        
         parsedItinerary = {
           days: [
             {
               day: 1,
-              theme: "Hong Kong Highlights",
-              activities: [
-                {
-                  time: "9:00 AM",
-                  duration: "2 hours",
-                  title: "Victoria Peak",
-                  description: "Iconic Hong Kong skyline views",
-                  transportation: "Peak Tram",
-                  cost: "HK$65",
-                  coordinates: { lat: 22.2708, lng: 114.1501 }
-                },
-                {
-                  time: "2:00 PM", 
-                  duration: "2 hours",
-                  title: "Tsim Sha Tsui Promenade",
-                  description: "Waterfront views and shopping",
-                  transportation: "MTR",
-                  cost: "Free",
-                  coordinates: { lat: 22.2944, lng: 114.1722 }
-                }
-              ]
+              theme: selectedLandmarkObjects.length > 0 ? "Your Selected Highlights" : "Hong Kong Essentials",
+              activities: fallbackActivities
             }
           ],
           overallTips: [
             "Use Octopus Card for transportation",
-            "Try local dim sum restaurants",
+            "Try local dim sum restaurants", 
             "Check weather before outdoor activities"
           ]
         };
