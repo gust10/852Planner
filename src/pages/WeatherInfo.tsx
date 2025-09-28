@@ -289,7 +289,7 @@ const WeatherInfo = () => {
               ) : (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
                   {dailyWeather.map((day, index) => (
-                    <div key={index} className="flex-shrink-0 w-24 text-center p-3 bg-gradient-subtle rounded-xl border border-border/30 hover:shadow-subtle transition-all duration-300 hover:scale-105">
+                    <div key={index} className="flex-shrink-0 w-24 text-center p-2 bg-gradient-subtle rounded-xl border border-border/30 hover:shadow-subtle transition-all duration-300 hover:scale-105">
                       <p className="text-xs font-medium text-muted-foreground mb-1">{day.day}</p>
                       <p className="text-xs text-muted-foreground mb-2">{day.date}</p>
                       <div className="mb-2">

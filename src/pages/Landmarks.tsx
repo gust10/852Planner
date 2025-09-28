@@ -143,7 +143,7 @@ const Landmarks = () => {
           {landmarks.map((landmark, index) => (
             <Card 
               key={landmark.id}
-              className={`card-hover p-4 cursor-pointer transition-all duration-300 animate-scale-in ${
+              className={`p-4 cursor-pointer transition-all duration-300 animate-scale-in ${
                 isSelected(landmark.id) 
                   ? "bg-gradient-neon shadow-neon border-2 border-red-500" 
                   : "border-0"

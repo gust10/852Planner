@@ -169,6 +169,11 @@
     background: var(--gradient-subtle);
   }
 
+  /* Slight red background variant using the primary color at low alpha */
+  .bg-slight-red {
+    background-color: hsl(var(--primary) / 0.06);
+  }
+
   /* Enhanced shadow effects */
   .shadow-glow {
     box-shadow: var(--shadow-glow);

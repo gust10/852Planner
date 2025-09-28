@@ -537,8 +537,8 @@ const Itinerary = () => {
           </Button>
         </div>
 
-        {/* Fixed Bottom Actions */}
-        <div className="flex gap-2 p-4 flex-shrink-0 bg-gradient-hero">
+  {/* Fixed Bottom Actions */}
+  <div className="flex gap-2 p-4 flex-shrink-0 bg-gradient-hero">
           <Button
             variant="outline"
             size="default"
