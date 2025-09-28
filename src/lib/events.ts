@@ -9,7 +9,7 @@ export const events = [
   {
     name: "Tai Hang Fire Dragon Dance",
     date: "05-07 Oct 2025",
-    location: "Tai Hang, Causeway Bay",
+    location: "Wun Sha Street",
     image: "https://www.discoverhongkong.com/content/dam/dhk/events/images/en/837/83736/tai-hang-fire-dragoon_global-release-_11_id79026_1024x768_cropped-0509204107.jpg"
   },
   {
@@ -57,7 +57,7 @@ export const events = [
   {
     name: "Temple Street - Endless Authentic Encounters",
     date: "15 Dec 2023 - 31 Dec 2025",
-    location: "Temple Street, Yau Ma Tei",
+    location: "Temple Street Night Market",
     image: "https://www.discoverhongkong.com/content/dam/dhk/events/images/en/814/81456/i2-1219122406.jpg"
   }
 ];
