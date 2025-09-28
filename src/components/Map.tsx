@@ -26,6 +26,7 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
   const polylineRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   // Get Google Maps API key from Supabase edge function
   const getApiKey = async () => {
@@ -49,12 +50,47 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
   // Initialize Google Maps
   useEffect(() => {
     let retryId: number | undefined;
+    let observer: IntersectionObserver | undefined;
 
     const attemptInit = async () => {
-      if (!mapContainer.current) {
-        console.log('[Map] Container not ready, retrying...');
+      console.log('[Map] Attempting init, container ref:', mapContainer.current);
+      console.log('[Map] Container current exists:', !!mapContainer.current);
+      
+      // Try to get container via ref first, then fallback to getElementById
+      let container = mapContainer.current;
+      if (!container) {
+        console.log('[Map] Ref not found, trying getElementById...');
+        container = document.getElementById('google-map-container') as HTMLDivElement;
+        if (container) {
+          console.log('[Map] Found container via getElementById');
+          mapContainer.current = container;
+        }
+      }
+      
+      if (!container) {
+        console.log('[Map] Container element not found, retrying...');
         if (retryId) clearTimeout(retryId);
-        retryId = window.setTimeout(attemptInit, 100);
+        retryId = window.setTimeout(attemptInit, 200); // Increased timeout
+        return;
+      }
+
+      // Check if container is visible and has dimensions
+      const rect = mapContainer.current.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        console.log('[Map] Container has no dimensions, waiting for visibility...');
+        
+        // Use IntersectionObserver to wait for container to become visible
+        if (!observer) {
+          observer = new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            if (entry.isIntersecting && entry.boundingClientRect.width > 0 && entry.boundingClientRect.height > 0) {
+              console.log('[Map] Container is now visible, initializing...');
+              observer?.disconnect();
+              attemptInit();
+            }
+          });
+          observer.observe(mapContainer.current);
+        }
         return;
       }
 
@@ -100,6 +136,16 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
 
         console.log('[Map] Map created');
         mapRef.current = map;
+        setIsMapReady(true);
+        
+        // If activities are already available, process them immediately after map creation
+        if (activities && activities.length > 0) {
+          console.log('[Map] Processing activities immediately after map creation');
+          // Small delay to ensure map is fully rendered
+          setTimeout(() => {
+            processActivitiesOnMap(map, activities);
+          }, 100);
+        }
       } catch (err) {
         console.error('[Map] Failed to load Google Maps:', err);
         setError(err instanceof Error ? err.message : 'Failed to load map');
@@ -109,33 +155,44 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
       }
     };
 
-    attemptInit();
+    // Add a small delay to ensure component is fully mounted
+    const initTimeout = setTimeout(() => {
+      attemptInit();
+    }, 100);
+
     return () => {
+      clearTimeout(initTimeout);
       if (retryId) clearTimeout(retryId);
+      if (observer) observer.disconnect();
     };
   }, []);
 
-  // Update markers and routes when activities change
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    const map = mapRef.current;
-
+  // Function to process activities and add markers to the map
+  const processActivitiesOnMap = (map: any, activitiesToProcess: Activity[]) => {
+    console.log('[Map] Processing activities:', activitiesToProcess);
+    console.log('[Map] Activities count:', activitiesToProcess.length);
+    
     // Clear existing markers and polyline
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
     if (polylineRef.current) {
       polylineRef.current.setMap(null);
     }
-
+    
     // Filter activities with valid coordinates
-    const validActivities = activities.filter(activity => 
+    const validActivities = activitiesToProcess.filter(activity => 
       activity.coordinates && 
       activity.coordinates.lat && 
       activity.coordinates.lng
     );
 
-    if (validActivities.length === 0) return;
+    console.log('[Map] Valid activities for mapping:', validActivities.length);
+    console.log('[Map] Valid activities:', validActivities.map(a => ({ title: a.title, coordinates: a.coordinates })));
+
+    if (validActivities.length === 0) {
+      console.log('[Map] No valid activities with coordinates found - no markers will be added');
+      return;
+    }
 
     const bounds = new window.google.maps.LatLngBounds();
     const path: any[] = [];
@@ -218,37 +275,52 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
       map.setCenter({ lat: validActivities[0].coordinates!.lat, lng: validActivities[0].coordinates!.lng });
       map.setZoom(14);
     }
+  };
 
-  }, [activities]);
-
-  if (error) {
-    return (
-      <div className={`w-full h-full rounded-lg bg-muted flex items-center justify-center ${className}`}>
-        <div className="text-center p-4">
-          <p className="text-sm text-muted-foreground mb-2">{error}</p>
-          <p className="text-xs text-muted-foreground">Check API key and referrer restrictions</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className={`w-full h-full rounded-lg bg-muted flex items-center justify-center ${className}`}>
-        <div className="text-center p-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading map...</p>
-        </div>
-      </div>
-    );
-  }
+  // Update markers and routes when activities change or map becomes ready
+  useEffect(() => {
+    if (!mapRef.current || !activities || !isMapReady) {
+      console.log('[Map] Not ready to process activities. Map:', !!mapRef.current, 'Activities:', activities?.length || 0, 'MapReady:', isMapReady);
+      return;
+    }
+    
+    console.log('[Map] Activities changed or map became ready, updating markers');
+    // Add a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      processActivitiesOnMap(mapRef.current, activities);
+    }, 50);
+    
+    return () => clearTimeout(timeoutId);
+  }, [activities, isMapReady]);
 
   return (
-    <div 
-      ref={mapContainer} 
-      className={`w-full h-full rounded-lg ${className}`}
-      style={{ minHeight: '200px' }}
-    />
+    <div className={`w-full h-full rounded-lg ${className}`} style={{ minHeight: '200px' }}>
+      {error ? (
+        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+          <div className="text-center p-4">
+            <p className="text-sm text-muted-foreground mb-2">{error}</p>
+            <p className="text-xs text-muted-foreground">Check API key and referrer restrictions</p>
+          </div>
+        </div>
+      ) : isLoading ? (
+        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+          <div className="text-center p-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+            <p className="text-sm text-muted-foreground">Loading map...</p>
+          </div>
+        </div>
+      ) : null}
+      
+      <div 
+        ref={(el) => {
+          console.log('[Map] Setting container ref:', el);
+          mapContainer.current = el;
+        }}
+        className="w-full h-full rounded-lg"
+        style={{ minHeight: '200px' }}
+        id="google-map-container"
+      />
+    </div>
   );
 };
 
