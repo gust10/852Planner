@@ -36,6 +36,7 @@ serve(async (req) => {
       activities.map(async (activity: any) => {
         try {
           let photoUrl = null;
+          let correctCoordinates = activity.coordinates; // Default to existing coordinates
           
           // First try to find place using coordinates if available
           if (activity.coordinates) {
@@ -49,6 +50,14 @@ serve(async (req) => {
             
             if (nearbyData.results && nearbyData.results.length > 0) {
               const place = nearbyData.results[0];
+              // Update coordinates with correct ones from Google Places
+              if (place.geometry && place.geometry.location) {
+                correctCoordinates = {
+                  lat: place.geometry.location.lat,
+                  lng: place.geometry.location.lng
+                };
+                console.log(`Updated coordinates for ${activity.title}: ${correctCoordinates.lat}, ${correctCoordinates.lng}`);
+              }
               if (place.photos && place.photos.length > 0) {
                 const photoReference = place.photos[0].photo_reference;
                 photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
@@ -69,6 +78,14 @@ serve(async (req) => {
             
             if (textData.results && textData.results.length > 0) {
               const place = textData.results[0];
+              // Update coordinates with correct ones from Google Places
+              if (place.geometry && place.geometry.location) {
+                correctCoordinates = {
+                  lat: place.geometry.location.lat,
+                  lng: place.geometry.location.lng
+                };
+                console.log(`Updated coordinates for ${activity.title} via text search: ${correctCoordinates.lat}, ${correctCoordinates.lng}`);
+              }
               if (place.photos && place.photos.length > 0) {
                 const photoReference = place.photos[0].photo_reference;
                 photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
@@ -79,7 +96,8 @@ serve(async (req) => {
           
           return {
             ...activity,
-            imageUrl: photoUrl
+            imageUrl: photoUrl,
+            coordinates: correctCoordinates // Include the corrected coordinates
           };
           
         } catch (error) {
