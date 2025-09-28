@@ -125,6 +125,10 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
         const map = new window.google.maps.Map(mapContainer.current!, {
           center: { lat: 22.3193, lng: 114.1694 },
           zoom: 11,
+          mapTypeControl: false,
+          streetViewControl: false,
+          zoomControl: false,
+          fullscreenControl: false,
           styles: [
             {
               featureType: 'poi',
@@ -137,6 +141,19 @@ const Map: React.FC<MapProps> = ({ activities, className = "" }) => {
         console.log('[Map] Map created');
         mapRef.current = map;
         setIsMapReady(true);
+        
+        // Hide Google Maps controls
+        const hideControls = () => {
+          const controls = document.querySelectorAll('.gm-svpc, .gm-style-cc, .gmnoprint');
+          controls.forEach(control => {
+            (control as HTMLElement).style.display = 'none';
+          });
+        };
+        
+        // Hide controls immediately and after a delay
+        hideControls();
+        setTimeout(hideControls, 1000);
+        setTimeout(hideControls, 3000);
         
         // If activities are already available, process them immediately after map creation
         if (activities && activities.length > 0) {
