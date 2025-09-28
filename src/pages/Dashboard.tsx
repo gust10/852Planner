@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { Calendar, MapPin, Clock, Trash2, Eye, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Clock, Trash2, Eye, ArrowLeft, Share2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -115,6 +115,41 @@ const Dashboard: React.FC = () => {
     return `${days} ${days === 1 ? 'day' : 'days'}`;
   };
 
+  const handleShare = async (itinerary: SavedItinerary) => {
+    const shareUrl = `${window.location.origin}/shared/${itinerary.id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: itinerary.title,
+          text: `Check out this amazing Hong Kong itinerary: ${itinerary.title}`,
+          url: shareUrl,
+        });
+      } catch (error) {
+        // User cancelled share or error occurred, fallback to clipboard
+        copyToClipboard(shareUrl);
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Link copied!",
+        description: "The shareable link has been copied to your clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy link. Please copy it manually.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getLandmarksCount = (landmarks: any[]) => {
     return landmarks.length;
   };
@@ -208,17 +243,28 @@ const Dashboard: React.FC = () => {
                   <div className="flex gap-2 pt-2">
                     <Button 
                       onClick={() => handleView(itinerary)} 
-                      className="flex-1"
+                      className={itinerary.is_public ? "flex-1" : "flex-1"}
                       size="sm"
                     >
                       <Eye className="mr-2 h-4 w-4" />
                       View
                     </Button>
+                    {itinerary.is_public && (
+                      <Button 
+                        onClick={() => handleShare(itinerary)} 
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                      >
+                        <Share2 className="mr-2 h-4 w-4" />
+                        Share
+                      </Button>
+                    )}
                     <Button 
                       onClick={() => setDeleteId(itinerary.id)} 
                       variant="outline"
                       size="sm"
-                      className="flex-1"
+                      className={itinerary.is_public ? "flex-1" : "flex-1"}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
