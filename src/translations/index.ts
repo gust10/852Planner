@@ -3,8 +3,8 @@ export type TranslationKey = keyof typeof translations.en;
 export const translations = {
   en: {
     // Main Page
-    'main.title': 'Hong Kong',
-    'main.subtitle': 'Smart Tourism',
+    'main.title': 'HK WonderPlan',
+    'main.subtitle': '',
     'main.description': 'Your intelligent travel companion',
     'main.cta': 'Start Your Journey',
     
@@ -43,7 +43,7 @@ export const translations = {
     'survey.interests.photography': 'Photography Spots',
     
     // Budget
-    'survey.budget.question': 'What is your budget range per person?',
+    'survey.budget.question': 'What is your budget range?',
     'survey.budget.low': 'Budget-friendly (Under $50/day)',
     'survey.budget.mid': 'Moderate ($50-150/day)',
     'survey.budget.high': 'Premium ($150-300/day)',
@@ -73,8 +73,8 @@ export const translations = {
   
   zh: {
     // Main Page
-    'main.title': '香港',
-    'main.subtitle': '智能旅遊',
+    'main.title': 'HK WonderPlan',
+    'main.subtitle': '',
     'main.description': '您的智能旅行夥伴',
     'main.cta': '開始您的旅程',
     
@@ -113,7 +113,7 @@ export const translations = {
     'survey.interests.photography': '攝影景點',
     
     // Budget
-    'survey.budget.question': '您的每人預算範圍是？',
+    'survey.budget.question': '您的預算範圍是？',
     'survey.budget.low': '經濟實惠 (每日少於$50)',
     'survey.budget.mid': '適中 (每日$50-150)',
     'survey.budget.high': '高級 (每日$150-300)',
@@ -143,8 +143,8 @@ export const translations = {
   
   ja: {
     // Main Page
-    'main.title': '香港',
-    'main.subtitle': 'スマート観光',
+    'main.title': 'HK WonderPlan',
+    'main.subtitle': '',
     'main.description': 'あなたのインテリジェント旅行コンパニオン',
     'main.cta': '旅を始める',
     
@@ -183,7 +183,7 @@ export const translations = {
     'survey.interests.photography': '撮影スポット',
     
     // Budget
-    'survey.budget.question': '一人当たりの予算範囲は？',
+    'survey.budget.question': '予算範囲は？',
     'survey.budget.low': 'バジェット（1日$50未満）',
     'survey.budget.mid': 'モデレート（1日$50-150）',
     'survey.budget.high': 'プレミアム（1日$150-300）',
@@ -213,8 +213,8 @@ export const translations = {
   
   ko: {
     // Main Page
-    'main.title': '홍콩',
-    'main.subtitle': '스마트 관광',
+    'main.title': 'HK WonderPlan',
+    'main.subtitle': '',
     'main.description': '당신의 지능형 여행 동반자',
     'main.cta': '여행 시작하기',
     
@@ -253,7 +253,7 @@ export const translations = {
     'survey.interests.photography': '사진 명소',
     
     // Budget
-    'survey.budget.question': '1인당 예산 범위는？',
+    'survey.budget.question': '예산 범위는？',
     'survey.budget.low': '저예산 (하루 $50 미만)',
     'survey.budget.mid': '보통 (하루 $50-150)',
     'survey.budget.high': '프리미엄 (하루 $150-300)',
@@ -283,8 +283,8 @@ export const translations = {
   
   es: {
     // Main Page
-    'main.title': 'Hong Kong',
-    'main.subtitle': 'Turismo Inteligente',
+    'main.title': 'HK WonderPlan',
+    'main.subtitle': '',
     'main.description': 'Su compañero inteligente de viaje',
     'main.cta': 'Comenzar Su Viaje',
     
@@ -323,7 +323,7 @@ export const translations = {
     'survey.interests.photography': 'Lugares Fotográficos',
     
     // Budget
-    'survey.budget.question': '¿Cuál es su rango de presupuesto por persona?',
+    'survey.budget.question': '¿Cuál es su rango de presupuesto?',
     'survey.budget.low': 'Económico (Menos de $50/día)',
     'survey.budget.mid': 'Moderado ($50-150/día)',
     'survey.budget.high': 'Premium ($150-300/día)',
@@ -353,8 +353,8 @@ export const translations = {
   
   fr: {
     // Main Page
-    'main.title': 'Hong Kong',
-    'main.subtitle': 'Tourisme Intelligent',
+    'main.title': 'HK WonderPlan',
+    'main.subtitle': '',
     'main.description': 'Votre compagnon de voyage intelligent',
     'main.cta': 'Commencer Votre Voyage',
     
@@ -393,7 +393,7 @@ export const translations = {
     'survey.interests.photography': 'Sites Photographiques',
     
     // Budget
-    'survey.budget.question': 'Quelle est votre gamme de budget par personne ?',
+    'survey.budget.question': 'Quelle est votre gamme de budget ?',
     'survey.budget.low': 'Économique (Moins de $50/jour)',
     'survey.budget.mid': 'Modéré ($50-150/jour)',
     'survey.budget.high': 'Premium ($150-300/jour)',

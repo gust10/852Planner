@@ -304,31 +304,36 @@ const WeatherInfo = () => {
             </Card>
 
             {/* Events Section - Bottom Half */}
-            <div className="bg-white rounded-2xl shadow-elevated p-4 overflow-x-auto overflow-y-hidden flex gap-4 items-start flex-[6] min-h-0">
-              {filteredEvents.map((event, index) => (
-                <div key={index} className="w-64 flex-shrink-0 flex flex-col justify-center items-center border border-border/20 rounded-xl p-2 sm:p-4 shadow-card">
-                  <div className="mb-3 w-full">
-                    <img src={event.image} alt={event.name} className="w-full h-32 object-cover rounded-lg" />
+            <Card className="bg-gradient-card card-hover border border-border/50 p-6 animate-scale-in shadow-elevated flex-[6] min-h-0">
+              <h3 className="text-lg font-display font-semibold mb-4 text-center text-gradient">
+                Events During Your Travel
+              </h3>
+              <div className="overflow-x-auto overflow-y-hidden flex gap-4 items-start">
+                {filteredEvents.map((event, index) => (
+                  <div key={index} className="w-64 flex-shrink-0 flex flex-col justify-center items-center border border-border/20 rounded-xl p-2 sm:p-4 shadow-card">
+                    <div className="mb-3 w-full">
+                      <img src={event.image} alt={event.name} className="w-full h-32 object-cover rounded-lg" />
+                    </div>
+                    <div
+                      className="text-lg font-semibold mb-2 text-center"
+                      title={event.name}
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: '1.2',
+                        height: '2.6em'
+                      }}
+                    >
+                      {event.name}
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
+                    <p className="text-sm text-foreground mb-2">{event.location}</p>
                   </div>
-                  <div
-                    className="text-lg font-semibold mb-2 text-center"
-                    title={event.name}
-                    style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      lineHeight: '1.2',
-                      height: '2.6em'
-                    }}
-                  >
-                    {event.name}
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
-                  <p className="text-sm text-foreground mb-2">{event.location}</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </Card>
           </div>
         </div>
 
