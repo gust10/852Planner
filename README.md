@@ -1,6 +1,6 @@
-# Hong Kong Wander Plan
+# WonderPlan HK
 
-A React application for planning and exploring trips in Hong Kong, built with modern web technologies.
+WonderPlan HK - A React application for planning and exploring trips in Hong Kong, built with modern web technologies.
 
 ## Features
 
@@ -33,7 +33,7 @@ A React application for planning and exploring trips in Hong Kong, built with mo
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd hongkong-wander-plan
+cd wonderplan-hk
 ```
 
 2. Install dependencies:

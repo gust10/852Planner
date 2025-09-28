@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-foreground">My Itineraries</h1>
-              <p className="text-muted-foreground">Manage your saved Hong Kong adventures</p>
+              <p className="text-muted-foreground">Manage your saved WonderPlan HK adventures</p>
             </div>
           </div>
           <Button onClick={() => navigate('/')} className="neon-button px-8">
