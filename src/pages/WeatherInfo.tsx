@@ -15,7 +15,7 @@ const WeatherInfo = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const WEATHER_API_KEY = "235247215c10867579d72a3e7efb722fd9184b30";
+  // Open-Meteo does not require an API key for basic forecasts
 
   // Filter events based on user's travel dates
   const filteredEvents = useMemo(() => {
@@ -81,6 +81,28 @@ const WeatherInfo = () => {
     return Sun; // default
   };
 
+  // Map Open-Meteo weather codes to simple human-readable conditions
+  const mapWeatherCodeToText = (code: number) => {
+    // Reference: https://open-meteo.com/en/docs#api_form
+    // Codes: 0 = Clear, 1-3 = Mainly Clear/Partly Cloudy/Overcast, 45/48 = Fog, 51-67 = Drizzle/Rain, 71-77 = Snow,
+    // 80-82 = Rain showers, 85-86 = Snow showers, 95-99 = Thunderstorm
+    if (code === 0) return 'Clear';
+    if (code >= 1 && code <= 3) return 'Partly Cloudy';
+    if (code === 45 || code === 48) return 'Fog';
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'Rain';
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return 'Snow';
+    if (code >= 95 && code <= 99) return 'Thunderstorm';
+    return 'Partly Cloudy';
+  };
+
+  // Format a Date to YYYY-MM-DD using the local date (avoids UTC shift)
+  const formatLocalDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = `${d.getMonth() + 1}`.padStart(2, '0');
+    const day = `${d.getDate()}`.padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
   const fetchWeatherData = async () => {
     try {
       setLoading(true);
@@ -91,15 +113,25 @@ const WeatherInfo = () => {
         throw new Error('No travel dates selected');
       }
 
-      // Calculate days between start and end date
-      const startDate = new Date(dateRange.from);
-      const endDate = new Date(dateRange.to);
-      const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
-      const days = Math.min(daysDiff, 10); // weatherAPI.com free tier supports up to 10 days
-      
-      const response = await fetch(
-        `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=Hong Kong&days=${days}&aqi=no&alerts=no&dt=${startDate.toISOString().split('T')[0]}`
-      );
+  // Normalize start/end to include full days (include last day)
+  const startDate = new Date(dateRange.from);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(dateRange.to);
+  endDate.setHours(23, 59, 59, 999);
+
+  // Calculate number of days (inclusive)
+  const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
+  const days = Math.min(daysDiff, 10); // weatherapi.com free tier supports up to 10 days
+
+  // Use Open-Meteo for forecast data (no API key required)
+  const lat = 22.3193; // Hong Kong latitude
+  const lon = 114.1694; // Hong Kong longitude
+  const startStr = formatLocalDate(startDate);
+  const endStr = formatLocalDate(endDate);
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=Asia%2FHong_Kong&start_date=${startStr}&end_date=${endStr}`;
+  console.log('OpenMeteo fetch - startDate:', startStr, 'endDate:', endStr, 'days:', days, 'url:', url);
+
+  const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error('Failed to fetch weather data');
@@ -107,48 +139,97 @@ const WeatherInfo = () => {
       
       const data = await response.json();
       
-      // Filter to only show dates within the travel range
-      const formattedWeather = data.forecast.forecastday
-        .filter((day: any) => {
-          const dayDate = new Date(day.date);
-          return dayDate >= startDate && dayDate <= endDate;
-        })
-        .map((day: any) => {
-          const date = new Date(day.date);
-          const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-          
-          return {
+      // Open-Meteo returns daily arrays; map them to the UI shape
+      const formattedWeather = [] as any[];
+      if (data && data.daily && Array.isArray(data.daily.time)) {
+        const times: string[] = data.daily.time;
+        const tMax: number[] = data.daily.temperature_2m_max || [];
+        const tMin: number[] = data.daily.temperature_2m_min || [];
+        const codes: number[] = data.daily.weathercode || [];
+
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        for (let i = 0; i < times.length; i++) {
+          const date = new Date(times[i]);
+          const max = typeof tMax[i] === 'number' ? tMax[i] : null;
+          const min = typeof tMin[i] === 'number' ? tMin[i] : null;
+          let avgFloat: number;
+          if (max !== null && min !== null) {
+            avgFloat = (max + min) / 2;
+          } else if (max !== null) {
+            avgFloat = max;
+          } else if (min !== null) {
+            avgFloat = min;
+          } else {
+            avgFloat = 0;
+          }
+          const avgInteger = Math.round(avgFloat);
+          const code = codes[i] ?? -1;
+          const condition = mapWeatherCodeToText(code);
+
+          formattedWeather.push({
             day: dayNames[date.getDay()],
             date: date.getDate(),
-            temperature: Math.round(day.day.avgtemp_c),
-            condition: day.day.condition.text,
-            humidity: day.day.avghumidity,
-            icon: getWeatherIcon(day.day.condition.text)
+            temperature: avgInteger,
+            condition,
+            humidity: null,
+            icon: getWeatherIcon(condition)
+          });
+        }
+      } else {
+        console.warn('OpenMeteo: unexpected response shape', data);
+      }
+
+      console.log('Formatted weather items:', formattedWeather.length, formattedWeather);
+
+      // If Open-Meteo returned no usable days, fallback to mock data for the trip dates
+      if (!formattedWeather.length) {
+        console.warn('No formatted weather from Open-Meteo, generating mock for trip dates');
+        const mockData = Array.from({ length: days }, (_, i) => {
+          const dayDate = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+          return {
+            day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][dayDate.getDay()],
+            date: dayDate.getDate(),
+            temperature: 22 + (i % 5),
+            condition: "Partly Cloudy",
+            humidity: 70,
+            icon: Sun
           };
         });
-      
-      setDailyWeather(formattedWeather);
+        setDailyWeather(mockData);
+      } else {
+        setDailyWeather(formattedWeather);
+      }
       setError(null);
     } catch (err) {
       console.error('Weather API error:', err);
       setError('Unable to load weather data');
-      // Fallback to mock data using the selected date range
-      const dateRange = surveyData?.dateRange;
+
+      // Fallback to mock data using the selected date range (start from trip start)
+      const dr = surveyData?.dateRange;
+      let mockStart = new Date();
       let days = 7;
-      if (dateRange?.from && dateRange?.to) {
-        const startDate = new Date(dateRange.from);
-        const endDate = new Date(dateRange.to);
-        days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
+      if (dr?.from && dr?.to) {
+        mockStart = new Date(dr.from);
+        mockStart.setHours(0, 0, 0, 0);
+        const mockEnd = new Date(dr.to);
+        mockEnd.setHours(23, 59, 59, 999);
+        days = Math.ceil((mockEnd.getTime() - mockStart.getTime()) / (1000 * 3600 * 24)) + 1;
       }
-      
-      const mockData = Array.from({ length: days }, (_, i) => ({
-        day: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i % 7],
-        date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).getDate(),
-        temperature: 22 + (i % 5),
-        condition: "Partly Cloudy",
-        humidity: 70,
-        icon: Sun
-      }));
+
+      console.log('Weather fallback - generating mock data from', mockStart, 'for', days, 'days');
+
+      const mockData = Array.from({ length: days }, (_, i) => {
+        const dayDate = new Date(mockStart.getTime() + i * 24 * 60 * 60 * 1000);
+        return {
+          day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][dayDate.getDay()],
+          date: dayDate.getDate(),
+          temperature: 22 + (i % 5),
+          condition: "Partly Cloudy",
+          humidity: 70,
+          icon: Sun
+        };
+      });
       setDailyWeather(mockData);
     } finally {
       setLoading(false);
@@ -208,7 +289,7 @@ const WeatherInfo = () => {
               ) : (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
                   {dailyWeather.map((day, index) => (
-                    <div key={index} className="flex-shrink-0 text-center min-w-[70px] p-3 bg-gradient-subtle rounded-xl border border-border/30 hover:shadow-subtle transition-all duration-300 hover:scale-105">
+                    <div key={index} className="flex-shrink-0 w-24 text-center p-3 bg-gradient-subtle rounded-xl border border-border/30 hover:shadow-subtle transition-all duration-300 hover:scale-105">
                       <p className="text-xs font-medium text-muted-foreground mb-1">{day.day}</p>
                       <p className="text-xs text-muted-foreground mb-2">{day.date}</p>
                       <div className="mb-2">
@@ -229,7 +310,20 @@ const WeatherInfo = () => {
                   <div className="mb-3 w-full">
                     <img src={event.image} alt={event.name} className="w-full h-32 object-cover rounded-lg" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-center">{event.name}</h3>
+                  <div
+                    className="text-lg font-semibold mb-2 text-center"
+                    title={event.name}
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      lineHeight: '1.2',
+                      height: '2.6em'
+                    }}
+                  >
+                    {event.name}
+                  </div>
                   <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
                   <p className="text-sm text-foreground mb-2">{event.location}</p>
                 </div>
