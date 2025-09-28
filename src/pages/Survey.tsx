@@ -535,7 +535,7 @@ const Survey = () => {
                     key={option.id}
                     variant={surveyData.styles.includes(option.id) ? "default" : "outline"}
                     size="lg"
-                    className={`interactive-scale text-left justify-start h-12 md:h-14 w-full text-xs ${
+                    className={`interactive-scale text-center justify-center h-12 md:h-14 w-full text-xs ${
                       surveyData.styles.includes(option.id) ? "neon-button" : ""
                     }`}
                     onClick={() => handleMultiSelectToggle(option.id)}
@@ -559,7 +559,7 @@ const Survey = () => {
                 {currentStepData.landmarks?.map((landmark: any) => (
                   <div
                     key={landmark.id}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
                       surveyData.selectedLandmarks.includes(landmark.id)
                         ? "border-primary bg-primary/10"
                         : "border-muted hover:border-primary/50"
