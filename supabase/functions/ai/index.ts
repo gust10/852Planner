@@ -366,7 +366,9 @@ IMPORTANT REQUIREMENTS:
 - MUST include ALL selected landmarks in the itinerary - these are the user's top priorities
 - Respect the user's budget constraints if provided
 - Match cuisine preferences for restaurant recommendations
-- Include specific restaurant names and locations (BE SPECIFIC WITH THE RESTAURANT NAME)
+- Include specific restaurant names WITH EXACT BRANCH LOCATIONS (e.g., "Tim Ho Wan - Central Station", "Maxim's Palace - City Hall", "Kam Wah Cafe - Mong Kok Branch")
+- Always specify the district/area for restaurants (e.g., Central, Tsim Sha Tsui, Causeway Bay, Mong Kok)
+- For chain restaurants, MUST include the specific branch name or location identifier
 - Provide realistic cost estimates in HK$ and USD
 - Consider travel interests when planning activities
 - Use the provided landmark details (duration, category, description) to plan realistic timing
@@ -385,6 +387,14 @@ REQUIRED JSON FORMAT:
           "description": "Brief description",
           "transportation": "MTR/Taxi/Walk",
           "cost": "HK$50-200 ($7-26 USD)"
+        },
+        {
+          "time": "12:00 PM",
+          "duration": "1 hour",
+          "title": "Tim Ho Wan - Central Station Branch",
+          "description": "Michelin-starred dim sum at the Central Station location",
+          "transportation": "MTR",
+          "cost": "HK$80-150 ($10-19 USD)"
         }
       ]
     }

@@ -36,75 +36,47 @@ serve(async (req) => {
       activities.map(async (activity: any) => {
         try {
           let photoUrl = null;
-          let correctCoordinates = activity.coordinates; // Default to existing coordinates
+          let correctCoordinates = null;
           
-          // First try to find place using coordinates if available
-          if (activity.coordinates) {
-            const { lat, lng } = activity.coordinates;
-            const nearbySearchUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=100&keyword=${encodeURIComponent(activity.title)}&key=${GOOGLE_MAPS_API_KEY}`;
-            
-            console.log(`Searching for place near coordinates: ${lat}, ${lng} with keyword: ${activity.title}`);
-            
-            const nearbyResponse = await fetch(nearbySearchUrl);
-            const nearbyData = await nearbyResponse.json();
-            
-            if (nearbyData.results && nearbyData.results.length > 0) {
-              const place = nearbyData.results[0];
-              // Update coordinates with correct ones from Google Places
-              if (place.geometry && place.geometry.location) {
-                correctCoordinates = {
-                  lat: place.geometry.location.lat,
-                  lng: place.geometry.location.lng
-                };
-                console.log(`Updated coordinates for ${activity.title}: ${correctCoordinates.lat}, ${correctCoordinates.lng}`);
-              }
-              if (place.photos && place.photos.length > 0) {
-                const photoReference = place.photos[0].photo_reference;
-                photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
-                console.log(`Found photo for ${activity.title} using coordinates`);
-              }
+          // Always use text search to find the most accurate location by name
+          // This ensures we get coordinates from Google Places API rather than using any existing coordinates
+          const query = `${activity.title} Hong Kong`;
+          const textSearchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${GOOGLE_MAPS_API_KEY}`;
+          
+          console.log(`Text searching for: ${query}`);
+          
+          const textResponse = await fetch(textSearchUrl);
+          const textData = await textResponse.json();
+          
+          if (textData.results && textData.results.length > 0) {
+            const place = textData.results[0];
+            // Get coordinates from Google Places
+            if (place.geometry && place.geometry.location) {
+              correctCoordinates = {
+                lat: place.geometry.location.lat,
+                lng: place.geometry.location.lng
+              };
+              console.log(`Found coordinates for ${activity.title}: ${correctCoordinates.lat}, ${correctCoordinates.lng}`);
             }
-          }
-          
-          // If no photo found with coordinates, try text search
-          if (!photoUrl) {
-            const query = `${activity.title} Hong Kong`;
-            const textSearchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${GOOGLE_MAPS_API_KEY}`;
-            
-            console.log(`Text searching for: ${query}`);
-            
-            const textResponse = await fetch(textSearchUrl);
-            const textData = await textResponse.json();
-            
-            if (textData.results && textData.results.length > 0) {
-              const place = textData.results[0];
-              // Update coordinates with correct ones from Google Places
-              if (place.geometry && place.geometry.location) {
-                correctCoordinates = {
-                  lat: place.geometry.location.lat,
-                  lng: place.geometry.location.lng
-                };
-                console.log(`Updated coordinates for ${activity.title} via text search: ${correctCoordinates.lat}, ${correctCoordinates.lng}`);
-              }
-              if (place.photos && place.photos.length > 0) {
-                const photoReference = place.photos[0].photo_reference;
-                photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
-                console.log(`Found photo for ${activity.title} using text search`);
-              }
+            if (place.photos && place.photos.length > 0) {
+              const photoReference = place.photos[0].photo_reference;
+              photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
+              console.log(`Found photo for ${activity.title}`);
             }
           }
           
           return {
             ...activity,
             imageUrl: photoUrl,
-            coordinates: correctCoordinates // Include the corrected coordinates
+            coordinates: correctCoordinates // Include the coordinates from Google Places API
           };
           
         } catch (error) {
           console.error(`Error fetching image for ${activity.title}:`, error);
           return {
             ...activity,
-            imageUrl: null
+            imageUrl: null,
+            coordinates: null
           };
         }
       })
