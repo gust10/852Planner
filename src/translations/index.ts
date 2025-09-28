@@ -21,6 +21,13 @@ export const translations = {
     'survey.dates.start': 'Start Date',
     'survey.dates.end': 'End Date',
     'survey.dates.placeholder': 'Select date',
+    'survey.dates.select': 'Select your travel dates',
+    'survey.dates.selected': 'Selected dates:',
+    'survey.dates.selectEnd': '(select end date)',
+    
+    // Daily Hours
+    'survey.time.question': 'What are your daily hours?',
+    'survey.time.hours': '{hours} hours of exploration',
     
     // Travel Party
     'survey.party.question': 'Who are you traveling with?',
@@ -41,6 +48,7 @@ export const translations = {
     'survey.interests.adventure': 'Adventure Activities',
     'survey.interests.relaxation': 'Relaxation & Wellness',
     'survey.interests.photography': 'Photography Spots',
+    'survey.interests.max': 'Choose up to 3 interests',
     
     // Budget
     'survey.budget.question': 'What is your budget range?',
@@ -48,6 +56,9 @@ export const translations = {
     'survey.budget.mid': 'Moderate ($50-150/day)',
     'survey.budget.high': 'Premium ($150-300/day)',
     'survey.budget.luxury': 'Luxury ($300+/day)',
+    'survey.budget.placeholder': 'Enter total budget (USD)',
+    'survey.budget.daily': 'Daily Budget',
+    'survey.budget.forDays': 'for {days} days',
     
     // Accommodation
     'survey.accommodation.question': 'What type of accommodation do you prefer?',
@@ -60,10 +71,14 @@ export const translations = {
     // Other Pages
     'weather.title': 'Weather Information',
     'landmarks.title': 'Select Popular Landmarks',
+    'landmarks.optional': 'Select landmarks you\'d like to visit (optional)',
     'itinerary.title': 'Your Itinerary',
     'notfound.title': '404 - Page Not Found',
     'notfound.description': 'The page you are looking for does not exist.',
     'notfound.back': 'Back to Home',
+    
+    // Food Preferences
+    'survey.food.cuisine': 'Cuisine Interests (optional)',
     
     // Common
     'common.loading': 'Loading...',
@@ -91,6 +106,13 @@ export const translations = {
     'survey.dates.start': '開始日期',
     'survey.dates.end': '結束日期',
     'survey.dates.placeholder': '選擇日期',
+    'survey.dates.select': '選擇您的旅行日期',
+    'survey.dates.selected': '已選日期：',
+    'survey.dates.selectEnd': '（選擇結束日期）',
+    
+    // Daily Hours
+    'survey.time.question': '您的每日時段是？',
+    'survey.time.hours': '{hours} 小時探索',
     
     // Travel Party
     'survey.party.question': '您與誰一起旅行？',
@@ -111,6 +133,7 @@ export const translations = {
     'survey.interests.adventure': '冒險活動',
     'survey.interests.relaxation': '放鬆與養生',
     'survey.interests.photography': '攝影景點',
+    'survey.interests.max': '最多選擇 3 項興趣',
     
     // Budget
     'survey.budget.question': '您的預算範圍是？',
@@ -118,6 +141,9 @@ export const translations = {
     'survey.budget.mid': '適中 (每日$50-150)',
     'survey.budget.high': '高級 (每日$150-300)',
     'survey.budget.luxury': '奢華 (每日$300+)',
+    'survey.budget.placeholder': '輸入總預算（美元）',
+    'survey.budget.daily': '每日預算',
+    'survey.budget.forDays': '共 {days} 天',
     
     // Accommodation
     'survey.accommodation.question': '您喜歡什麼類型的住宿？',
@@ -130,10 +156,14 @@ export const translations = {
     // Other Pages
     'weather.title': '天氣資訊',
     'landmarks.title': '選擇熱門地標',
+    'landmarks.optional': '選擇您想參觀的地標（可選）',
     'itinerary.title': '您的行程',
     'notfound.title': '404 - 找不到頁面',
     'notfound.description': '您尋找的頁面不存在。',
     'notfound.back': '返回首頁',
+    
+    // Food Preferences
+    'survey.food.cuisine': '美食興趣（可選）',
     
     // Common
     'common.loading': '載入中...',
@@ -161,6 +191,13 @@ export const translations = {
     'survey.dates.start': '開始日',
     'survey.dates.end': '終了日',
     'survey.dates.placeholder': '日付を選択',
+    'survey.dates.select': '旅行日付を選択してください',
+    'survey.dates.selected': '選択された日付：',
+    'survey.dates.selectEnd': '（終了日を選択）',
+    
+    // Daily Hours
+    'survey.time.question': '1日の時間帯は？',
+    'survey.time.hours': '{hours}時間の探索',
     
     // Travel Party
     'survey.party.question': '誰と一緒に旅行されますか？',
@@ -181,6 +218,7 @@ export const translations = {
     'survey.interests.adventure': 'アドベンチャー活動',
     'survey.interests.relaxation': 'リラクゼーション・ウェルネス',
     'survey.interests.photography': '撮影スポット',
+    'survey.interests.max': '最大3つまで選択',
     
     // Budget
     'survey.budget.question': '予算範囲は？',
@@ -188,6 +226,9 @@ export const translations = {
     'survey.budget.mid': 'モデレート（1日$50-150）',
     'survey.budget.high': 'プレミアム（1日$150-300）',
     'survey.budget.luxury': 'ラグジュアリー（1日$300+）',
+    'survey.budget.placeholder': '総予算を入力（USD）',
+    'survey.budget.daily': '1日あたりの予算',
+    'survey.budget.forDays': '{days}日間',
     
     // Accommodation
     'survey.accommodation.question': 'どのような宿泊施設をお好みですか？',
@@ -200,10 +241,14 @@ export const translations = {
     // Other Pages
     'weather.title': '天気情報',
     'landmarks.title': '人気ランドマークを選択',
+    'landmarks.optional': '訪れたいランドマークを選択（任意）',
     'itinerary.title': 'あなたの旅程',
     'notfound.title': '404 - ページが見つかりません',
     'notfound.description': 'お探しのページは存在しません。',
     'notfound.back': 'ホームに戻る',
+    
+    // Food Preferences
+    'survey.food.cuisine': '料理の興味（任意）',
     
     // Common
     'common.loading': '読み込み中...',
@@ -231,6 +276,13 @@ export const translations = {
     'survey.dates.start': '시작 날짜',
     'survey.dates.end': '종료 날짜',
     'survey.dates.placeholder': '날짜 선택',
+    'survey.dates.select': '여행 날짜를 선택하세요',
+    'survey.dates.selected': '선택된 날짜:',
+    'survey.dates.selectEnd': '（종료 날짜 선택）',
+    
+    // Daily Hours
+    'survey.time.question': '일일 시간대는？',
+    'survey.time.hours': '{hours}시간 탐험',
     
     // Travel Party
     'survey.party.question': '누구와 함께 여행하시나요？',
@@ -251,6 +303,7 @@ export const translations = {
     'survey.interests.adventure': '모험 활동',
     'survey.interests.relaxation': '휴식 & 웰니스',
     'survey.interests.photography': '사진 명소',
+    'survey.interests.max': '최대 3개까지 선택',
     
     // Budget
     'survey.budget.question': '예산 범위는？',
@@ -258,6 +311,9 @@ export const translations = {
     'survey.budget.mid': '보통 (하루 $50-150)',
     'survey.budget.high': '프리미엄 (하루 $150-300)',
     'survey.budget.luxury': '럭셔리 (하루 $300+)',
+    'survey.budget.placeholder': '총 예산 입력 (USD)',
+    'survey.budget.daily': '일일 예산',
+    'survey.budget.forDays': '{days}일 동안',
     
     // Accommodation
     'survey.accommodation.question': '어떤 숙박시설을 선호하시나요？',
@@ -270,10 +326,14 @@ export const translations = {
     // Other Pages
     'weather.title': '날씨 정보',
     'landmarks.title': '인기 명소 선택',
+    'landmarks.optional': '방문하고 싶은 명소를 선택하세요 (선택사항)',
     'itinerary.title': '당신의 여행 계획',
     'notfound.title': '404 - 페이지를 찾을 수 없습니다',
     'notfound.description': '찾으시는 페이지가 존재하지 않습니다.',
     'notfound.back': '홈으로 돌아가기',
+    
+    // Food Preferences
+    'survey.food.cuisine': '음식 취향 (선택사항)',
     
     // Common
     'common.loading': '로딩 중...',
@@ -301,6 +361,13 @@ export const translations = {
     'survey.dates.start': 'Fecha de Inicio',
     'survey.dates.end': 'Fecha de Final',
     'survey.dates.placeholder': 'Seleccionar fecha',
+    'survey.dates.select': 'Seleccione sus fechas de viaje',
+    'survey.dates.selected': 'Fechas seleccionadas:',
+    'survey.dates.selectEnd': '(seleccionar fecha final)',
+    
+    // Daily Hours
+    'survey.time.question': '¿Cuáles son sus horas diarias?',
+    'survey.time.hours': '{hours} horas de exploración',
     
     // Travel Party
     'survey.party.question': '¿Con quién viaja?',
@@ -321,6 +388,7 @@ export const translations = {
     'survey.interests.adventure': 'Actividades de Aventura',
     'survey.interests.relaxation': 'Relajación y Bienestar',
     'survey.interests.photography': 'Lugares Fotográficos',
+    'survey.interests.max': 'Elija hasta 3 intereses',
     
     // Budget
     'survey.budget.question': '¿Cuál es su rango de presupuesto?',
@@ -328,6 +396,9 @@ export const translations = {
     'survey.budget.mid': 'Moderado ($50-150/día)',
     'survey.budget.high': 'Premium ($150-300/día)',
     'survey.budget.luxury': 'Lujo ($300+/día)',
+    'survey.budget.placeholder': 'Ingrese presupuesto total (USD)',
+    'survey.budget.daily': 'Presupuesto Diario',
+    'survey.budget.forDays': 'por {days} días',
     
     // Accommodation
     'survey.accommodation.question': '¿Qué tipo de alojamiento prefiere?',
@@ -340,10 +411,14 @@ export const translations = {
     // Other Pages
     'weather.title': 'Información del Tiempo',
     'landmarks.title': 'Seleccionar Lugares Populares',
+    'landmarks.optional': 'Seleccione lugares de interés que le gustaría visitar (opcional)',
     'itinerary.title': 'Su Itinerario',
     'notfound.title': '404 - Página No Encontrada',
     'notfound.description': 'La página que busca no existe.',
     'notfound.back': 'Volver al Inicio',
+    
+    // Food Preferences
+    'survey.food.cuisine': 'Intereses Culinarios (opcional)',
     
     // Common
     'common.loading': 'Cargando...',
@@ -371,6 +446,13 @@ export const translations = {
     'survey.dates.start': 'Date de Début',
     'survey.dates.end': 'Date de Fin',
     'survey.dates.placeholder': 'Sélectionner une date',
+    'survey.dates.select': 'Sélectionnez vos dates de voyage',
+    'survey.dates.selected': 'Dates sélectionnées :',
+    'survey.dates.selectEnd': '(sélectionner date de fin)',
+    
+    // Daily Hours
+    'survey.time.question': 'Quelles sont vos heures quotidiennes ?',
+    'survey.time.hours': '{hours} heures d\'exploration',
     
     // Travel Party
     'survey.party.question': 'Avec qui voyagez-vous ?',
@@ -391,6 +473,7 @@ export const translations = {
     'survey.interests.adventure': 'Activités d\'Aventure',
     'survey.interests.relaxation': 'Détente et Bien-être',
     'survey.interests.photography': 'Sites Photographiques',
+    'survey.interests.max': 'Choisissez jusqu\'à 3 intérêts',
     
     // Budget
     'survey.budget.question': 'Quelle est votre gamme de budget ?',
@@ -398,6 +481,9 @@ export const translations = {
     'survey.budget.mid': 'Modéré ($50-150/jour)',
     'survey.budget.high': 'Premium ($150-300/jour)',
     'survey.budget.luxury': 'Luxe ($300+/jour)',
+    'survey.budget.placeholder': 'Entrez le budget total (USD)',
+    'survey.budget.daily': 'Budget Journalier',
+    'survey.budget.forDays': 'pour {days} jours',
     
     // Accommodation
     'survey.accommodation.question': 'Quel type d\'hébergement préférez-vous ?',
@@ -410,10 +496,14 @@ export const translations = {
     // Other Pages
     'weather.title': 'Informations Météo',
     'landmarks.title': 'Sélectionner Sites Populaires',
+    'landmarks.optional': 'Sélectionnez les sites que vous aimeriez visiter (optionnel)',
     'itinerary.title': 'Votre Itinéraire',
     'notfound.title': '404 - Page Non Trouvée',
     'notfound.description': 'La page que vous cherchez n\'existe pas.',
     'notfound.back': 'Retour à l\'Accueil',
+    
+    // Food Preferences
+    'survey.food.cuisine': 'Intérêts Culinaires (optionnel)',
     
     // Common
     'common.loading': 'Chargement...',

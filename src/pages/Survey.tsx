@@ -62,7 +62,7 @@ const Survey = () => {
       key: "dates"
     },
     {
-      title: "What are your daily hours?",
+      title: t('survey.time.question'),
       type: "timeRangeSlider",
       key: "timeRange",
       min: 6,
@@ -429,17 +429,17 @@ const Survey = () => {
               <div className="text-center h-16 flex flex-col justify-center">
                 {surveyData.dateRange?.from ? (
                   <>
-                    <div className="text-sm text-muted-foreground">Selected dates:</div>
+                    <div className="text-sm text-muted-foreground">{t('survey.dates.selected')}</div>
                     <div className="text-lg font-semibold">
                       {format(surveyData.dateRange.from, "MMM dd")}
                       {surveyData.dateRange.to && surveyData.dateRange.to !== surveyData.dateRange.from && (
                         <span> - {format(surveyData.dateRange.to, "MMM dd, yyyy")}</span>
                       )}
-                      {!surveyData.dateRange.to && <span className="text-muted-foreground"> (select end date)</span>}
+                      {!surveyData.dateRange.to && <span className="text-muted-foreground">{t('survey.dates.selectEnd')}</span>}
                     </div>
                   </>
                 ) : (
-                  <div className="text-sm text-muted-foreground">Select your travel dates</div>
+                  <div className="text-sm text-muted-foreground">{t('survey.dates.select')}</div>
                 )}
               </div>
 
@@ -464,7 +464,7 @@ const Survey = () => {
                   {formatTime(surveyData.timeRange[0])} - {formatTime(surveyData.timeRange[1])}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {surveyData.timeRange[1] - surveyData.timeRange[0]} hours of exploration
+                  {t('survey.time.hours', { hours: surveyData.timeRange[1] - surveyData.timeRange[0] })}
                 </div>
               </div>
               <RangeSlider
@@ -503,7 +503,7 @@ const Survey = () => {
               <div className="text-center">
                 <Input
                   type="number"
-                  placeholder="Enter total budget (USD)"
+                  placeholder={t('survey.budget.placeholder')}
                   value={surveyData.totalBudget || ""}
                   onChange={(e) => handleBudgetChange(e.target.value)}
                   className="text-center text-xl font-semibold h-14 border-2"
@@ -512,12 +512,12 @@ const Survey = () => {
               </div>
               {surveyData.totalBudget > 0 && surveyData.dateRange?.from && surveyData.dateRange?.to && (
                 <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-1">Daily Budget</div>
+                  <div className="text-sm text-muted-foreground mb-1">{t('survey.budget.daily')}</div>
                   <div className="text-2xl font-bold bg-gradient-neon bg-clip-text text-transparent">
                     ${getDailyBudget()}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    for {differenceInDays(surveyData.dateRange.to, surveyData.dateRange.from) + 1} days
+                    {t('survey.budget.forDays', { days: differenceInDays(surveyData.dateRange.to, surveyData.dateRange.from) + 1 })}
                   </div>
                 </div>
               )}
@@ -527,7 +527,7 @@ const Survey = () => {
           {currentStepData.type === "multiSelect" && (
             <>
               <div className="text-xs text-muted-foreground mb-2 text-center">
-                Choose up to 3 interests
+                {t('survey.interests.max')}
               </div>
               <div className="grid grid-cols-2 gap-3 w-full max-w-md">
                 {currentStepData.options?.map((option: any) => (
@@ -553,7 +553,7 @@ const Survey = () => {
           {currentStepData.type === "landmarks" && (
             <div className="space-y-4">
               <div className="text-xs text-muted-foreground mb-2 text-center">
-                Select landmarks you'd like to visit (optional)
+                {t('landmarks.optional')}
               </div>
               <div className="max-h-80 overflow-y-auto space-y-3">
                 {currentStepData.landmarks?.map((landmark: any) => (
@@ -606,7 +606,7 @@ const Survey = () => {
               {/* Cuisine Preferences */}
               <div className="mb-2">
                 <h3 className="text-sm font-semibold mb-2 text-muted-foreground">
-                  Cuisine Interests (optional)
+                  {t('survey.food.cuisine')}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {currentStepData.cuisineOptions?.map((option: any) => (
