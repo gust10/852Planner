@@ -366,7 +366,7 @@ IMPORTANT REQUIREMENTS:
 - MUST include ALL selected landmarks in the itinerary - these are the user's top priorities
 - Respect the user's budget constraints if provided
 - Match cuisine preferences for restaurant recommendations
-- Include specific restaurant names and locations
+- Include specific restaurant names and locations (BE SPECIFIC WITH THE RESTAURANT NAME)
 - Provide realistic cost estimates in HK$ and USD
 - Consider travel interests when planning activities
 - Use the provided landmark details (duration, category, description) to plan realistic timing
@@ -384,8 +384,7 @@ REQUIRED JSON FORMAT:
           "title": "Activity Name",
           "description": "Brief description",
           "transportation": "MTR/Taxi/Walk",
-          "cost": "HK$50-200 ($7-26 USD)",
-          "coordinates": {"lat": 22.3193, "lng": 114.1694}
+          "cost": "HK$50-200 ($7-26 USD)"
         }
       ]
     }

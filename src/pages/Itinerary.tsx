@@ -463,7 +463,7 @@ const Itinerary = () => {
                             }}
                           >
                             <ExternalLink className="w-3 h-3 mr-1" />
-                            {index === 0 ? 'Navigate Here' : 'Navigate from Previous'}
+                            {index === 0 ? 'Navigate Here' : 'Navigate Here'}
                           </Button>
                         </div>
                       </div>
