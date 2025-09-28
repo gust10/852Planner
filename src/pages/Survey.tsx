@@ -7,7 +7,7 @@ import { RangeSlider } from "@/components/ui/range-slider";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, ArrowRight, CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarIcon, Minus, Plus } from "lucide-react";
 import getLandmarkImageUrl from '@/lib/landmarkImages';
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -220,9 +220,19 @@ const Survey = () => {
   };
 
   const handleSelectionClick = (value: string) => {
+    let defaultPeople = 1;
+    if (value === t('survey.party.couple')) {
+      defaultPeople = 2;
+    } else if (value === t('survey.party.family')) {
+      defaultPeople = 3; // Default for family
+    } else if (value === t('survey.party.friends')) {
+      defaultPeople = 4; // Default for group of friends
+    }
+    
     setSurveyData(prev => ({
       ...prev,
-      companions: value
+      companions: value,
+      totalPeople: defaultPeople
     }));
   };
 
@@ -231,6 +241,20 @@ const Survey = () => {
     setSurveyData(prev => ({
       ...prev,
       totalPeople: numValue
+    }));
+  };
+
+  const handleIncrementPeople = () => {
+    setSurveyData(prev => ({
+      ...prev,
+      totalPeople: Math.min(20, prev.totalPeople + 1)
+    }));
+  };
+
+  const handleDecrementPeople = () => {
+    setSurveyData(prev => ({
+      ...prev,
+      totalPeople: Math.max(1, prev.totalPeople - 1)
     }));
   };
 
@@ -479,22 +503,64 @@ const Survey = () => {
           )}
 
           {currentStepData.type === "selection" && (
-            <div className="flex justify-center">
-              <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                {currentStepData.options?.map((option) => (
-                  <Button
-                    key={option}
-                    variant={surveyData.companions === option ? "default" : "outline"}
-                    size="lg"
-                    className={`interactive-scale text-center justify-center h-12 md:h-14 w-full ${
-                      surveyData.companions === option ? "neon-button" : ""
-                    }`}
-                    onClick={() => handleSelectionClick(option)}
-                  >
-                    {option}
-                  </Button>
-                ))}
+            <div className="space-y-6">
+              <div className="flex justify-center">
+                <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                  {currentStepData.options?.map((option) => (
+                    <Button
+                      key={option}
+                      variant={surveyData.companions === option ? "default" : "outline"}
+                      size="lg"
+                      className={`interactive-scale text-center justify-center h-12 md:h-14 w-full ${
+                        surveyData.companions === option ? "neon-button" : ""
+                      }`}
+                      onClick={() => handleSelectionClick(option)}
+                    >
+                      {option}
+                    </Button>
+                  ))}
+                </div>
               </div>
+              
+              {/* Show number input for Family or Group of Friends */}
+              {(surveyData.companions === t('survey.party.family') || surveyData.companions === t('survey.party.friends')) && (
+                <div className="space-y-3 animate-fade-in">
+                  <div className="text-center">
+                    <label className="text-sm font-medium text-muted-foreground mb-3 block">
+                      {t('survey.party.total')}
+                    </label>
+                    <div className="flex items-center justify-center gap-4">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDecrementPeople}
+                        disabled={surveyData.totalPeople <= 1}
+                        className="h-10 w-10 rounded-full interactive-scale"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      <div className="text-2xl font-bold bg-gradient-neon bg-clip-text text-transparent min-w-[3rem] text-center">
+                        {surveyData.totalPeople}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleIncrementPeople}
+                        disabled={surveyData.totalPeople >= 20}
+                        className="h-10 w-10 rounded-full interactive-scale"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="text-center text-xs text-muted-foreground">
+                    {surveyData.companions === t('survey.party.family') 
+                      ? t('survey.party.family.hint')
+                      : t('survey.party.friends.hint')
+                    }
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
