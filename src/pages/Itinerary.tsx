@@ -340,11 +340,16 @@ const Itinerary = () => {
 
   // Parse and categorize expenses from itinerary
   const getExpenseData = () => {
-    if (!aiItinerary?.days) return [];
+    if (!aiItinerary?.days) {
+      console.log('[Expense] No itinerary days available:', aiItinerary);
+      return [];
+    }
 
     const expenseCategories: { [key: string]: number } = {};
     const numberOfPeople = surveyData?.totalPeople || 1;
-    
+
+    console.log('[Expense] Calculating for', numberOfPeople, 'people');
+
     aiItinerary.days.forEach((day: any) => {
       day.activities?.forEach((activity: any) => {
         if (activity.cost) {
@@ -354,36 +359,36 @@ const Itinerary = () => {
             const minCost = parseInt(costMatch[1]);
             const maxCost = parseInt(costMatch[2]);
             const avgCost = Math.round((minCost + maxCost) / 2);
-            
+
             // Multiply by number of people
             const totalCost = avgCost * numberOfPeople;
-            
+
             // Categorize based on activity type
             let category = 'Attractions';
             const title = activity.title.toLowerCase();
             const description = activity.description.toLowerCase();
-            
+
             if (title.includes('disneyland') || title.includes('ocean park') || title.includes('theme')) {
               category = 'Theme Parks';
             } else if (title.includes('peak') || title.includes('harbour') || title.includes('view') || title.includes('museum') || title.includes('gallery')) {
               category = 'Sightseeing';
             } else if (title.includes('market') || title.includes('shopping') || title.includes('mall')) {
               category = 'Shopping';
-            } else if (title.includes('food') || title.includes('dim sum') || title.includes('restaurant') || 
-                      title.includes('dining') || title.includes('lunch') || title.includes('dinner') || 
+            } else if (title.includes('food') || title.includes('dim sum') || title.includes('restaurant') ||
+                      title.includes('dining') || title.includes('lunch') || title.includes('dinner') ||
                       title.includes('breakfast') || title.includes('eat') || title.includes('meal') ||
                       title.includes('cafe') || title.includes('tea') || title.includes('bar') ||
                       description.includes('food') || description.includes('dining') || description.includes('restaurant') ||
                       description.includes('eat') || description.includes('meal')) {
               category = 'Food & Dining';
-            } else if (title.includes('mtr') || title.includes('transport') || title.includes('bus') || 
+            } else if (title.includes('mtr') || title.includes('transport') || title.includes('bus') ||
                       title.includes('ferry') || title.includes('taxi') || title.includes('metro') ||
                       title.includes('subway') || title.includes('train')) {
               category = 'Transportation';
             }
-            
+
             expenseCategories[category] = (expenseCategories[category] || 0) + totalCost;
-            
+
             // Debug logging to understand categorization
             console.log(`[Expense] "${activity.title}" -> ${category} (HK$${totalCost})`);
           }
@@ -405,8 +410,17 @@ const Itinerary = () => {
     });
   };
 
-  const expenseData = getExpenseData();
-  const totalExpenses = expenseData.reduce((sum, item) => sum + item.amount, 0);
+  // Calculate expense data reactively
+  const expenseData = React.useMemo(() => {
+    console.log('[Expense] Recalculating expense data');
+    console.log('[Expense] surveyData:', surveyData);
+    console.log('[Expense] aiItinerary:', aiItinerary);
+    return getExpenseData();
+  }, [aiItinerary, surveyData]);
+
+  const totalExpenses = React.useMemo(() => {
+    return expenseData.reduce((sum, item) => sum + item.amount, 0);
+  }, [expenseData]);
 
   // Colors for the chart
   const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0'];

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
-import { User, LogOut, Calendar, Settings } from 'lucide-react';
+import { User, LogOut, Calendar } from 'lucide-react';
 
 const UserMenu: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -58,10 +58,6 @@ const UserMenu: React.FC = () => {
         <DropdownMenuItem onClick={() => navigate('/dashboard')}>
           <Calendar className="mr-2 h-4 w-4" />
           <span>My Itineraries</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/profile')}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={signOut}>
