@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="./logo_readme.png" alt="852Planner Logo" width="200" height="auto" />
+<img src="./public/logo_readme.png" alt="852Planner Logo" width="200" height="auto" />
 
 <br/>
 <br/>
