@@ -814,28 +814,6 @@ const Itinerary = () => {
               </div>
             </DialogContent>
           </Dialog>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="interactive-scale"
-              >
-                <MessageSquare className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[80vh]">
-              <DialogHeader>
-                <DialogTitle>AI Prompt Data</DialogTitle>
-              </DialogHeader>
-              <div className="overflow-auto max-h-[60vh]">
-                <pre className="text-xs bg-muted p-4 rounded-lg overflow-x-auto whitespace-pre-wrap">
-                  {JSON.stringify({ selectedLandmarks, surveyData }, null, 2)}
-                </pre>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
 
         {/* Save Dialog */}
