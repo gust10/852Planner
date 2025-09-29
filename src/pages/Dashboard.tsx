@@ -216,7 +216,7 @@ const Dashboard: React.FC = () => {
                     <div className="space-y-1">
                       <CardTitle className="line-clamp-1">{itinerary.title}</CardTitle>
                       <CardDescription className="line-clamp-2">
-                        {itinerary.description || `Explore ${getLandmarksCount(itinerary.selected_landmarks)} amazing locations in Hong Kong`}
+                        {itinerary.description || `Personalized Hong Kong itinerary`}
                       </CardDescription>
                     </div>
                     {itinerary.is_public && (
