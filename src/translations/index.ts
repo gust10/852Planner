@@ -86,6 +86,12 @@ export const translations = {
     'common.loading': 'Loading...',
     'common.error': 'Something went wrong',
     'common.retry': 'Try Again',
+    
+    // User Menu
+    'auth.signIn': 'Sign In',
+    'auth.account': 'Account',
+    'auth.myItineraries': 'My Itineraries',
+    'auth.signOut': 'Sign out',
   },
   
   zh: {
@@ -173,6 +179,12 @@ export const translations = {
     'common.loading': '載入中...',
     'common.error': '出現錯誤',
     'common.retry': '重試',
+    
+    // User Menu
+    'auth.signIn': '登入',
+    'auth.account': '帳戶',
+    'auth.myItineraries': '我的行程',
+    'auth.signOut': '登出',
   },
   
   ja: {
@@ -260,6 +272,12 @@ export const translations = {
     'common.loading': '読み込み中...',
     'common.error': 'エラーが発生しました',
     'common.retry': '再試行',
+    
+    // User Menu
+    'auth.signIn': 'サインイン',
+    'auth.account': 'アカウント',
+    'auth.myItineraries': 'マイ旅程',
+    'auth.signOut': 'サインアウト',
   },
   
   ko: {
@@ -347,6 +365,12 @@ export const translations = {
     'common.loading': '로딩 중...',
     'common.error': '오류가 발생했습니다',
     'common.retry': '다시 시도',
+    
+    // User Menu
+    'auth.signIn': '로그인',
+    'auth.account': '계정',
+    'auth.myItineraries': '내 여행 계획',
+    'auth.signOut': '로그아웃',
   },
   
   es: {
@@ -434,6 +458,12 @@ export const translations = {
     'common.loading': 'Cargando...',
     'common.error': 'Algo salió mal',
     'common.retry': 'Intentar Nuevamente',
+    
+    // User Menu
+    'auth.signIn': 'Iniciar sesión',
+    'auth.account': 'Cuenta',
+    'auth.myItineraries': 'Mis itinerarios',
+    'auth.signOut': 'Cerrar sesión',
   },
   
   fr: {
@@ -521,5 +551,11 @@ export const translations = {
     'common.loading': 'Chargement...',
     'common.error': 'Quelque chose s\'est mal passé',
     'common.retry': 'Réessayer',
+    
+    // User Menu
+    'auth.signIn': 'Se connecter',
+    'auth.account': 'Compte',
+    'auth.myItineraries': 'Mes itinéraires',
+    'auth.signOut': 'Se déconnecter',
   },
 };
