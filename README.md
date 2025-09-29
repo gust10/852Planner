@@ -4,6 +4,9 @@
 
 <img src="./logo_readme.png" alt="852Planner Logo" width="200" height="auto" />
 
+<br/>
+<br/>
+
 ![852Planner Logo](https://img.shields.io/badge/852Planner-Travel_Planning-blue?style=for-the-badge&logo=react&logoColor=white)
 ![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
