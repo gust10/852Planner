@@ -153,24 +153,21 @@ const WeatherInfo = () => {
           const date = new Date(times[i]);
           const max = typeof tMax[i] === 'number' ? tMax[i] : null;
           const min = typeof tMin[i] === 'number' ? tMin[i] : null;
-          let avgFloat: number;
-          if (max !== null && min !== null) {
-            avgFloat = (max + min) / 2;
-          } else if (max !== null) {
-            avgFloat = max;
+          let temperature: number;
+          if (max !== null) {
+            temperature = Math.round(max);
           } else if (min !== null) {
-            avgFloat = min;
+            temperature = Math.round(min);
           } else {
-            avgFloat = 0;
+            temperature = 0;
           }
-          const avgInteger = Math.round(avgFloat);
           const code = codes[i] ?? -1;
           const condition = mapWeatherCodeToText(code);
 
           formattedWeather.push({
             day: dayNames[date.getDay()],
             date: date.getDate(),
-            temperature: avgInteger,
+            temperature: temperature,
             condition,
             humidity: null,
             icon: getWeatherIcon(condition)
