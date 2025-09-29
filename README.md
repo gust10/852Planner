@@ -1,6 +1,6 @@
 # 852Planner
 
-852Planner - A React application for planning and exploring trips in Hong Kong, built with modern web technologies.
+An AI-powered Application for planning and exploring trips in Hong Kong.
 
 ## Features
 
