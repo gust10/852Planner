@@ -1,4 +1,4 @@
-# Environment Variables Setup for WonderPlan HK
+# Environment Variables Setup for 852Planner
 
 ## Required Environment Variables
 
@@ -17,7 +17,7 @@ Your edge functions need the following environment variables to be set in Supaba
 ### Option 1: Using Supabase Dashboard (Recommended)
 
 1. Go to your [Supabase Dashboard](https://app.supabase.com)
-2. Select your project: **WonderPlan HK**
+2. Select your project: **852Planner**
 3. Navigate to **Settings** → **Edge Functions**
 4. Add the following secrets:
 

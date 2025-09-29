@@ -27,7 +27,7 @@ const Index = () => {
         {/* Main heading */}
         <div className="space-y-4">
           <h1 className="text-5xl md:text-6xl font-display font-bold text-foreground leading-tight">
-            Wonder<span className="text-red-500">Plan</span> HK
+            852<span className="text-red-500">Planner</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground font-light">
             {t('main.description')}

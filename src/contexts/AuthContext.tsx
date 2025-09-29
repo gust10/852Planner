@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast({
         title: "Account created successfully!",
-        description: "Welcome to HK WonderPlan! You can now start planning your adventure.",
+        description: "Welcome to 852Planner! You can now start planning your adventure.",
       });
     } catch (error: any) {
       toast({
