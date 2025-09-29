@@ -113,9 +113,18 @@ const WeatherInfo = () => {
         throw new Error('No travel dates selected');
       }
 
+      // Check if the selected date is more than 14 days ahead
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startDate = new Date(dateRange.from);
+      startDate.setHours(0, 0, 0, 0);
+      const daysFromToday = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+      
+      if (daysFromToday > 14) {
+        throw new Error('DATE_TOO_FAR');
+      }
+
   // Normalize start/end to include full days (include last day)
-  const startDate = new Date(dateRange.from);
-  startDate.setHours(0, 0, 0, 0);
   const endDate = new Date(dateRange.to);
   endDate.setHours(23, 59, 59, 999);
 
@@ -200,7 +209,11 @@ const WeatherInfo = () => {
       setError(null);
     } catch (err) {
       console.error('Weather API error:', err);
-      setError('Unable to load weather data');
+      if (err instanceof Error && err.message === 'DATE_TOO_FAR') {
+        setError('Selected dates exceed available weather data. Please choose dates within 14 days from today.');
+      } else {
+        setError('Unable to load weather data');
+      }
       setDailyWeather([]); // Clear any existing weather data
     } finally {
       setLoading(false);
@@ -260,8 +273,13 @@ const WeatherInfo = () => {
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <Cloud className="w-12 h-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground mb-2 text-center">Sorry, we currently can't get weather data</p>
-                  <p className="text-xs text-muted-foreground text-center">Weather information is temporarily unavailable</p>
+                  <p className="text-muted-foreground mb-2 text-center">{error}</p>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {error.includes('exceed available weather data') 
+                      ? 'Weather forecasts are only available for the next 14 days' 
+                      : 'Weather information is temporarily unavailable'
+                    }
+                  </p>
                 </div>
               ) : (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
