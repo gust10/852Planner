@@ -12,7 +12,7 @@
 
 *Create personalized itineraries, explore landmarks, and discover the best of Hong Kong with intelligent recommendations.*
 
-[🚀 Live Demo](https://852-planner.vercel.app) • [📖 Documentation](#) • [🐛 Report Bug](https://github.com/gust10/HK-WonderPlan/issues)
+[🚀 Live Demo](https://852planner.com)
 
 </div>
 
@@ -130,7 +130,7 @@
 ## 📁 Project Structure
 
 ```
-852-planner/
+852planner/
 ├── 📁 public/                 # Static assets
 │   ├── favicon.svg
 │   ├── logo.png
@@ -245,6 +245,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 **Made with ❤️ for Hong Kong travelers**
 
-[⭐ Star us on GitHub](https://github.com/gust10/HK-WonderPlan) • [🐛 Report Issues](https://github.com/gust10/HK-WonderPlan/issues) • [💬 Join Discussions](https://github.com/gust10/HK-WonderPlan/discussions)
+[⭐ Star us on GitHub](https://github.com/gust10/852Planner)
 
 </div>
