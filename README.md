@@ -1,6 +1,6 @@
-# WonderPlan HK
+# 852Planner
 
-WonderPlan HK - A React application for planning and exploring trips in Hong Kong, built with modern web technologies.
+852Planner - A React application for planning and exploring trips in Hong Kong, built with modern web technologies.
 
 ## Features
 
@@ -33,7 +33,7 @@ WonderPlan HK - A React application for planning and exploring trips in Hong Kon
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd wonderplan-hk
+cd 852-planner
 ```
 
 2. Install dependencies:

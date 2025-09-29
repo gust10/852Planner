@@ -62,7 +62,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'si
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Welcome to HK WonderPlan</DialogTitle>
+          <DialogTitle>Welcome to 852Planner</DialogTitle>
           <DialogDescription>
             Sign in to save your itineraries and access them from anywhere
           </DialogDescription>

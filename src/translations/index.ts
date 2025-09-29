@@ -3,9 +3,9 @@ export type TranslationKey = keyof typeof translations.en;
 export const translations = {
   en: {
     // Main Page
-    'main.title': 'WonderPlan HK',
+    'main.title': '852Planner',
     'main.subtitle': '',
-    'main.description': 'Your intelligent HK travel companion',
+    'main.description': 'Your intelligent travel companion',
     'main.cta': 'Start Your Journey',
     
     // Survey Page
@@ -90,9 +90,9 @@ export const translations = {
   
   zh: {
     // 主頁面
-    'main.title': 'WonderPlan HK',
+    'main.title': '852Planner',
     'main.subtitle': '',
-    'main.description': '您的智能香港旅行夥伴',
+    'main.description': '您的智能旅行夥伴',
     'main.cta': '開始您的旅程',
     
     // Survey Page
@@ -177,9 +177,9 @@ export const translations = {
   
   ja: {
     // メインページ
-    'main.title': 'WonderPlan HK',
+    'main.title': '852Planner',
     'main.subtitle': '',
-    'main.description': 'あなたのインテリジェント香港旅行コンパニオン',
+    'main.description': 'あなたのインテリジェント旅行コンパニオン',
     'main.cta': '旅を始める',
     
     // Survey Page
@@ -264,9 +264,9 @@ export const translations = {
   
   ko: {
     // 메인 페이지
-    'main.title': 'WonderPlan HK',
+    'main.title': '852Planner',
     'main.subtitle': '',
-    'main.description': '당신의 지능형 홍콩 여행 동반자',
+    'main.description': '당신의 지능형 여행 동반자',
     'main.cta': '여행 시작하기',
     
     // Survey Page
@@ -351,9 +351,9 @@ export const translations = {
   
   es: {
     // Main Page
-    'main.title': 'WonderPlan HK',
+    'main.title': '852Planner',
     'main.subtitle': '',
-    'main.description': 'Su compañero inteligente de viajes de Hong Kong',
+    'main.description': 'Su compañero inteligente de viajes',
     'main.cta': 'Comenzar Su Viaje',
     
     // Survey Page
@@ -438,9 +438,9 @@ export const translations = {
   
   fr: {
     // Main Page
-    'main.title': 'WonderPlan HK',
+    'main.title': '852Planner',
     'main.subtitle': '',
-    'main.description': 'Votre compagnon de voyage intelligent de Hong Kong',
+    'main.description': 'Votre compagnon de voyage intelligent',
     'main.cta': 'Commencer Votre Voyage',
     
     // Survey Page
