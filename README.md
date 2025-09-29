@@ -3,6 +3,8 @@
 <div align="center">
 
 ![852Planner Logo](https://img.shields.io/badge/852Planner-Travel_Planning-blue?style=for-the-badge&logo=react&logoColor=white)
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 
@@ -10,7 +12,7 @@
 
 *Create personalized itineraries, explore landmarks, and discover the best of Hong Kong with intelligent recommendations.*
 
-[Live Demo](https://852planner.com)
+[🚀 Live Demo](https://852-planner.vercel.app) • [📖 Documentation](#) • [🐛 Report Bug](https://github.com/gust10/HK-WonderPlan/issues)
 
 </div>
 
