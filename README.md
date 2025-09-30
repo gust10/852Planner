@@ -25,20 +25,17 @@
 
 ## 📸 Screenshots
 
-<div align="center">
+<div align="center" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
 
-### Landing Page
-<img src="./public/demo_1.png" alt="852Planner Landing Page" width="250" />
+<img src="./public/demo_1.png" alt="852Planner Landing Page" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+<img src="./public/demo_2.png" alt="Travel Preferences Survey" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+<img src="./public/demo_3.png" alt="Personalized Itinerary" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+<img src="./public/demo_4.png" alt="Expense Breakdown" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
 
-### Travel Survey
-<img src="./public/demo_2.png" alt="Travel Preferences Survey" width="250" />
+</div>
 
-### AI-Generated Itinerary
-<img src="./public/demo_3.png" alt="Personalized Itinerary" width="250" />
-
-### Interactive Map & Weather
-<img src="./public/demo_4.png" alt="Map View with Weather Info" width="250" />
-
+<div align="center" style="margin-top: 10px; font-size: 14px; color: #666;">
+Landing Page • Travel Survey • AI Itinerary • Map & Weather
 </div>
 
 ---
