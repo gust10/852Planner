@@ -35,7 +35,7 @@
 </div>
 
 <div align="center" style="margin-top: 10px; font-size: 14px; color: #666;">
-Landing Page • Travel Survey • AI Itinerary • Map & Weather
+Landing Page • Travel Survey • AI Itinerary • Expense Breakdown
 </div>
 
 ---
