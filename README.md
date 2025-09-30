@@ -23,6 +23,26 @@
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### Landing Page
+<img src="./public/demo_1.png" alt="852Planner Landing Page" width="600" />
+
+### Travel Survey
+<img src="./public/demo_2.png" alt="Travel Preferences Survey" width="600" />
+
+### AI-Generated Itinerary
+<img src="./public/demo_3.png" alt="Personalized Itinerary" width="600" />
+
+### Interactive Map & Weather
+<img src="./public/demo_4.png" alt="Map View with Weather Info" width="600" />
+
+</div>
+
+---
+
 ## ✨ Features
 
 ### 🧠 AI-Powered Planning
